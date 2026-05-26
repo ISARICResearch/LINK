@@ -27,8 +27,7 @@
 		out:fly|global={{ y: 10, duration: 100 }}
 	>
 		<div class="w-full">
-
-			<Welcome {profile}/>
+			<Welcome {profile} />
 			<div class=" border-inherit w-full text-stone-800 dark:text-stone-300">
 				<button
 					onclick={() => {
@@ -77,6 +76,42 @@
 					</div>
 				{/if}
 			</div>
+		</div>
+		
+		<div class="w-full flex justify-center">
+			{#await data.dataPromise}
+				<button
+					class="{button.green} border-[3px] text-lg right-0 font-semibold opacity-40 hover:opacity-100 hover:shadow-sm px-4 cursor-pointer rounded-xl mt-5"
+				>
+					Go to Next Segment
+				</button>
+			{:then loadedData}
+				{@const nextSegmentTuple = findNextSegment(
+					loadedData.locationTree,
+					loadedData.segmentMap,
+					'/home',
+					'forward'
+				)}
+				{@const slug = nextSegmentTuple?.[0]}
+				{#if slug}
+					<button
+						title={'Next segment ' + slug}
+						onclick={() => {
+							goto(slug, { state: { form: nextSegmentTuple[1] } });
+						}}
+						class="{button.green.default} {button.green
+							.hover} border-[3px] text-lg right-0 font-semibold opacity-90 hover:opacity-100 hover:shadow-sm px-4 cursor-pointer rounded-xl mt-5"
+					>
+						Go to Next Segment: {slug.split('/').at(-1)}
+					</button>
+				{:else}
+					<div
+						class=" border-[3px] text-lg right-0 font-semibold opacity-40 hover:opacity-100 hover:shadow-sm px-4 cursor-pointer rounded-xl mt-5"
+					>
+						No more segments to translate!
+					</div>
+				{/if}
+			{/await}
 		</div>
 
 		{#each routes as route}
@@ -130,41 +165,5 @@
 				</div>
 			</div>
 		{/each}
-
-		<div class="w-full flex justify-center">
-			{#await data.dataPromise}
-				<button
-					class="{button.green} border-[3px] text-lg right-0 font-semibold opacity-40 hover:opacity-100 hover:shadow-sm px-4 cursor-pointer rounded-xl mt-5"
-				>
-					Go to Next Segment
-				</button>
-			{:then loadedData}
-				{@const nextSegmentTuple = findNextSegment(
-					loadedData.locationTree,
-					loadedData.segmentMap,
-					'/home',
-					'forward'
-				)}
-				{@const slug = nextSegmentTuple?.[0]}
-				{#if slug}
-					<button
-						title={'Next segment ' + slug}
-						onclick={() => {
-							goto(slug, { state: { form: nextSegmentTuple[1] } });
-						}}
-						class="{button.green.default} {button.green
-							.hover} border-[3px] text-lg right-0 font-semibold opacity-90 hover:opacity-100 hover:shadow-sm px-4 cursor-pointer rounded-xl mt-5"
-					>
-						Go to Next Segment: {slug.split('/').at(-1)}
-					</button>
-				{:else}
-					<div
-						class=" border-[3px] text-lg right-0 font-semibold opacity-40 hover:opacity-100 hover:shadow-sm px-4 cursor-pointer rounded-xl mt-5"
-					>
-						No more segments to translate!
-					</div>
-				{/if}
-			{/await}
-		</div>
 	</div>
 {/if}

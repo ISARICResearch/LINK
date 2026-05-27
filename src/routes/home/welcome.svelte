@@ -16,13 +16,14 @@
 		};
 	} = $props();
 
-	let instructionsOpen = $state(true);
+	let started = $derived(new Date().toJSON().slice(0, 10) < profile.created_at.slice(0, 10));
+	let instructionsOpen = $derived(started.valueOf());
 
 	const language = $derived(capitalizeFirstLetter(profile.language ? profile.language : ''));
 </script>
 
 <div class="w-full text-stone-800 dark:text-stone-300">
-	<div class="max-w-3xl p-0 m-auto text-lg font-normal">
+	<div class=" p-0 m-auto text-lg font-normal">
 		<h1 class="italic text-3xl p-0 font-medium w-full mb-4 text-center">
 			<span class=""
 				><span class="font-bold">L</span>anguage
@@ -37,12 +38,34 @@
 			translations are helping people around the world!
 		</p>
 
-		<fieldset class=" bg-stone-200 border-2 border-stone-500 rounded-xl shadow-md mb-15">
-			<legend class="font-bold ml-3 text-2xl px-1"
-				><!--<button
-					onclick={() => (instructionsOpen = instructionsOpen)}
-					class="cursor-pointer hover:underline"></button
-				>-->Instructions</legend
+		<fieldset
+			class=" border-2 {instructionsOpen
+				? 'shadow-md border-stone-500'
+				: 'border-stone-400'} rounded-xl mb-4"
+		>
+			<legend class="ml-3 p-1"
+				><button
+					onclick={() => (instructionsOpen = !instructionsOpen)}
+					class="font-bold flex hover:shadow-xs hover:underline object-center text-2xl px-1 hover:bg-stone-100 rounded-lg cursor-pointer"
+					><svg
+						class="{instructionsOpen
+							? 'rotate-90'
+							: ''} stroke-stone-900 dark:stroke-stone-200 duration-200 transition-transform h-8 w-8 p-1"
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+					>
+						<path
+							fill="none"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="3"
+							d="m9 5l6 7l-6 7"
+						/>
+					</svg>
+					Instructions
+				</button></legend
 			>
 			<div
 				class="{instructionsOpen

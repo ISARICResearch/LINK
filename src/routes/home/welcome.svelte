@@ -39,14 +39,14 @@
 		</p>
 
 		<fieldset
-			class=" border-2 {instructionsOpen
-				? 'shadow-md border-stone-500'
-				: 'border-stone-400'} rounded-xl mb-4"
+			class=" border {instructionsOpen
+				? 'shadow-md border-stone-700'
+				: 'border-stone-400'} rounded-lg mb-4"
 		>
 			<legend class="ml-3 px-1"
 				><button
 					onclick={() => (instructionsOpen = !instructionsOpen)}
-					class="font-bold flex hover:bg-stone-100 hover:shadow-xs translate-y-0 hover:underline object-center text-2xl pr-2 px-1 rounded-xl cursor-pointer"
+					class="font-bold flex hover:bg-stone-100 hover:shadow-xs translate-y-0 hover:underline object-center text-2xl pr-2 px-1 rounded-lg cursor-pointer"
 					><svg
 						class="{instructionsOpen
 							? 'rotate-90'

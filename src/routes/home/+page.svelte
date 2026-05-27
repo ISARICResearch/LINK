@@ -31,9 +31,9 @@
 			<Welcome {profile} />
 
 			<fieldset
-				class=" bg-stone-200 border-2 {presetsOpen
-					? 'shadow-md border-stone-500'
-					: 'border-stone-400'} rounded-xl mb-15"
+				class=" bg-stone-200 border {presetsOpen
+					? 'shadow-md border-stone-700'
+					: 'border-stone-400'} rounded-lg mb-15"
 			>
 				<legend class="ml-3 px-1 text-lg flex"
 					><button

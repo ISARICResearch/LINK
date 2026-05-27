@@ -6,7 +6,7 @@
 	//const footerLinkStyle = ' hover:underline hover:text-stone-800 dark:hover:text-stone-200 ';
 </script>
 
-<footer class="w-full flex max-w-lg m-auto flex-col text-center {footerTextStyle} my-25">
+<footer class="w-full flex max-w-md p-8 m-auto flex-col text-center {footerTextStyle} my-25">
 	<p class="mb-5 text-md inline-block">
 		Have you encountered a bug, issue, or error? <br /><a
 			title="Issue Report Form"

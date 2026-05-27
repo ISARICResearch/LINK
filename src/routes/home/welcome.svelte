@@ -43,10 +43,10 @@
 				? 'shadow-md border-stone-500'
 				: 'border-stone-400'} rounded-xl mb-4"
 		>
-			<legend class="ml-3 p-1"
+			<legend class="ml-3 px-1"
 				><button
 					onclick={() => (instructionsOpen = !instructionsOpen)}
-					class="font-bold flex hover:shadow-xs hover:underline object-center text-2xl px-1 hover:bg-stone-100 rounded-lg cursor-pointer"
+					class="font-bold flex hover:bg-stone-100 hover:shadow-xs translate-y-0 hover:underline object-center text-2xl pr-2 px-1 rounded-xl cursor-pointer"
 					><svg
 						class="{instructionsOpen
 							? 'rotate-90'

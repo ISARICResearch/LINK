@@ -11,7 +11,7 @@
 	let profile = $derived(data.profile);
 	let presetsOpen = $derived(!profile.selected_preset);
 
-	let presetName = $derived(profile.selected_preset?.split('_')[1]);
+	let presetName = $derived(profile.selected_preset?.split('_')[1] ?? profile.selected_preset);
 	let routes = ['arc', 'lists'];
 </script>
 
@@ -35,10 +35,10 @@
 					? 'shadow-md border-stone-500'
 					: 'border-stone-400'} rounded-xl mb-15"
 			>
-				<legend class="ml-3 p-1 text-lg flex"
+				<legend class="ml-3 px-1 text-lg flex"
 					><button
 						onclick={() => (presetsOpen = !presetsOpen)}
-						class="font-bold flex hover:shadow-xs hover:underline object-center text-2xl px-1 hover:bg-stone-100 rounded-lg cursor-pointer"
+						class="font-bold flex hover:shadow-xs hover:underline object-center text-2xl px-1 pr-3 hover:bg-stone-100 rounded-lg cursor-pointer"
 						><svg
 							class="{presetsOpen
 								? 'rotate-90'
@@ -56,10 +56,13 @@
 								d="m9 5l6 7l-6 7"
 							/>
 						</svg>
-
-						CRF to Translate:
+						Form to Translate
 					</button>
-					<p class="h-full align-text-bottom flex">{presetName}</p>
+					<p
+						class="h-full align-bottom origin-bottom object-bottom mt-0.5 px-2 font-serif italic bg-stone-300 rounded-xl mx-1"
+					>
+						{presetName}
+					</p>
 				</legend>
 				<div
 					class="{presetsOpen

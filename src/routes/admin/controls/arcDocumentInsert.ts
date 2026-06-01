@@ -1,6 +1,6 @@
 import type { DocumentInsert, OriginalSegmentRow } from '$lib/supabase/types';
 import _ from 'lodash';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../../supabaseClient';
 import { GetArcPresets } from './findArcPresets';
 
 async function PullAllDocumentData() {

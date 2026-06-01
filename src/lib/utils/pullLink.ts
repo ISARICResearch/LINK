@@ -33,7 +33,7 @@ export type LinkStructure = [LinkSegments, LinkTranslationsRecord];
 // == == Pull LINK for version == == //
 // @ optional "version" and "set" later (when we have a new database to store each )
 export const pullLink = async (version: string): Promise<LinkStructure> => {
-	// = ( 1 ) = pull original segments
+	// = ( 1 ) = pull original segmentsfi
 	console.log('Pulling LINK; get original segments');
 	const originalSegmentList = await pullOriginalSegments(version);
 	// * map to id

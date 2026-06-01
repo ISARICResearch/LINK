@@ -13,12 +13,12 @@ import {
 	type ArcLanguageStructure,
 	type ArcStructure
 } from './export/pullArcTranslations';
-import { pullLink, type LinkSegments, type LinkTranslationsRecord } from './pullLink';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../../supabaseClient';
 import _ from 'lodash';
 import type { Database } from '$lib/supabase/database.types';
 import { ArcEnglishToInsert, ListsEnglishToInsert, PLDEnglishToInsert } from './arcSegmentInsert';
 import { HandleDocumentInsert } from './arcDocumentInsert';
+import { pullLink, type LinkSegments, type LinkTranslationsRecord } from '../../../lib/utils/pullLink';
 
 // Handle
 async function HandleArcOriginalSegments(

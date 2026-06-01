@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import { pullArcTranslations, type ArcVersionStructure } from './pullArcTranslations';
 import Papa from 'papaparse';
-import { pullLink } from '../pullLink';
+import { pullLink } from '../../../../lib/utils/pullLink';
 import { formatArc, modifyArcFromLink } from '../updateArcFromLink';
 import { pushFolderToGitHub } from './pushToGithub';
 

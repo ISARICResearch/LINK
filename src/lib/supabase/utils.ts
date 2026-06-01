@@ -29,8 +29,11 @@ export async function paginateQuery<
 	T extends PostgrestFilterBuilder<any, any, any, any, any, any, any>
 >(
 	query: T,
-	pageSize: number
+	pageSize: number,
+	label: string
 ): Promise<{ data: ExtractQueryResult<T> | null; error: Error | null }> {
+	console.log('Start ' + label);
+	const startTime = performance.now();
 	const retrievedData: ExtractQueryResult<T> = [] as any; // We'll need to cast since we're building it up
 	let page = 0;
 	let hasMore = true;
@@ -57,6 +60,7 @@ export async function paginateQuery<
 			hasMore = false;
 		}
 	}
+	console.log('Finished ' + label + ': ' + (performance.now() - startTime));
 
 	return { data: retrievedData, error: null };
 }
@@ -69,6 +73,14 @@ export function getEarliestEvent<T extends { created_at: string }>(rows: T[]): T
 		current.created_at < earliest.created_at ? current : earliest
 	);
 	return earliestRow;
+}
+
+export function getLatestEvent<T extends { created_at: string }>(rows: T[]): T | null {
+	if (rows.length == 0) return null;
+	const latestRow = rows.reduce((latest, current) =>
+		current.created_at > latest.created_at ? current : latest
+	);
+	return latestRow;
 }
 
 /*

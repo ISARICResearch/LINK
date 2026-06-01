@@ -446,7 +446,7 @@ export async function UpdatePATOnSubmission(
 	*/
 }
 
-function getAcceptedTranslation(
+export function getAcceptedTranslation(
 	at: AcceptedTranslationRow | null,
 	ft_array: ForwardTranslationRow[],
 	tr_array: TranslationReviewRow[],
@@ -494,7 +494,7 @@ function getAcceptedTranslation(
 		}
 
 		// + score is number of user
-		console.log('score: ' + userVotes[text].users.size, ' for ' + text);
+		//console.log('score: ' + userVotes[text].users.size, ' for ' + text);
 		const votes = userVotes[text].users.size;
 		if (votes > winningVotes) {
 			winningText = text;

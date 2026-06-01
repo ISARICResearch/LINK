@@ -1,6 +1,6 @@
 import type { OriginalSegmentRow } from '$lib/supabase/types';
 import type { ArcVersionStructure } from './export/pullArcTranslations';
-import type { LinkTranslation, LinkTranslationsRecord } from './pullLink';
+import type { LinkTranslation, LinkTranslationsRecord } from '../../../lib/utils/pullLink';
 
 // == == Format arc to have needed new columns == == //
 export const formatArc = async (arc: ArcVersionStructure) => {

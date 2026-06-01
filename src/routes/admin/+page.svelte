@@ -1,14 +1,22 @@
 <script lang="ts">
 	import { button } from '$lib/styles';
 	import { fly } from 'svelte/transition';
-	import { getArcVersions } from './getArcVersions';
 	import { goto } from '$app/navigation';
-	import { AddArcVersionToLink } from './githubToSupabaseNew';
 	import type { GithubLanguage } from '$lib/types';
-	import { exportToZip, exportToGit } from './export/export';
-
+	import { exportToZip, exportToGit } from './controls/export/export';
+	import { AddArcVersionToLink } from './controls/githubToSupabaseNew';
+	import { getArcVersions } from './controls/getArcVersions';
+	import { repairLink } from '$lib/utils/repairTranslations';
+	import { pullLink } from '$lib/utils/pullLink';
 	let arcVersions: Promise<Record<string, string[]>> = $state(getArcVersions());
 	let selectedVersion = $derived(Object.keys(arcVersions)[0]);
+
+	async function printStatus(version: string) {
+		const link = await pullLink(version);
+
+		for (const language of link)
+
+	}
 </script>
 
 {#await arcVersions}
@@ -101,6 +109,44 @@
 				</ol>
 			</div>
 
+			<div class="sm:flex p-1.5">
+				<button
+					title="Pull Lists from GitHub"
+					class="w-1/3 mt-1 min-w-60 h-8 border-3 hover:shadow mr-2 font-semibold rounded-lg cursor-pointer
+					opacity-80 hover:opacity-100
+						border-yellow-600 hover:bg-yellow-600/20
+						dark:border-yellow-600 dark:hover:bg-yellow-600/20
+					"
+					onclick={async () => {
+						await repairLink(selectedVersion);
+					}}
+				>
+					Repair Link
+				</button>
+				<p>
+					this runs a script to pull LINK, check that translation progress and accepted transaltions
+					are 100% correct. Then if any aren't, fix them.
+				</p>
+			</div>
+			<div class="sm:flex p-1.5">
+				<button
+					title="Pull Lists from GitHub"
+					class="w-1/3 mt-1 min-w-60 h-8 border-3 hover:shadow mr-2 font-semibold rounded-lg cursor-pointer
+					opacity-80 hover:opacity-100
+						border-yellow-600 hover:bg-yellow-600/20
+						dark:border-yellow-600 dark:hover:bg-yellow-600/20
+					"
+					onclick={async () => {
+						await printStatus(selectedVersion);
+					}}
+				>
+					Print Status
+				</button>
+				<p>
+					this runs a script to pull LINK, check that translation progress and accepted transaltions
+					are 100% correct. Then if any aren't, fix them.
+				</p>
+			</div>
 			<div class="sm:flex p-1.5">
 				<button
 					title="Pull Lists from GitHub"

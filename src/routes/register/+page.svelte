@@ -77,7 +77,7 @@
 		px-7 my-5 py-7 shadow-sm border border-stone-400 dark:border-stone-800 rounded-xl text-xl w-full
 		"
 	>
-		<form onsubmit={handleSignUp}>
+		<form method="post" onsubmit={handleSignUp}>
 			<label title="Please provide your full name as 'First Last'" class="{labelStyle} mb-3">
 				Full Name
 				<input

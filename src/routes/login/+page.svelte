@@ -74,7 +74,7 @@
 			<!--
 			<h1 class="text-4xl w-full text-center p-2">Login</h1>
 			-->
-			<form class="text-xl" onsubmit={handleSignIn}>
+			<form class="text-xl" onsubmit={handleSignIn} method="post">
 				<line class="w-full"> </line>
 				<label class="font-medium">
 					<input

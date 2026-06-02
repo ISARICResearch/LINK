@@ -1,18 +1,18 @@
 on:
   schedule:
-    - cron: '0 9 * * 1'  
+    - cron: '0 3 * * 5'  
   workflow_dispatch:
 
 jobs:
-  run-admin-task:
+  update-link-from-arc:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: '20'
           cache: 'npm'

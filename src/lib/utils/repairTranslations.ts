@@ -23,18 +23,10 @@ import type {
 } from '$lib/supabase/types';
 import { getLatestEvent } from '$lib/supabase/utils';
 import { supabase } from '../../supabaseClient';
-import { pullLink, type LinkTranslation } from './pullLink';
+import { pullLink } from './pullLink';
 
 export async function repairLink(version: string) {
 	const startT = performance.now();
-
-	// & check if in review when should be in forward
-	const wrongProgressStep = (t: LinkTranslation) => {
-		const user_t = t.forwardTranslations?.filter((ft) => ft.user_id != null);
-		if (user_t?.length == 0 && t.translationProgress?.translation_step == 'review') return true;
-		return false;
-	};
-
 	const link = await pullLink(version);
 	const linkTranslations = link[1];
 	const progressUpsert: (TranslationProgressInsert | TranslationProgressRow)[] = [];
@@ -61,12 +53,22 @@ export async function repairLink(version: string) {
 				});
 
 			// * update progress if in wrong step
-			if (wrongProgressStep(obj)) {
-				if (!obj.translationProgress) continue;
-				const row = obj.translationProgress;
-				row.translation_step = calculatedStep;
-				progressUpsert.push(row);
-			} else if (obj.translationProgress) calculatedStep = obj.translationProgress.translation_step;
+			if (obj.translationProgress) {
+				const rightSteps: Database['public']['Enums']['TranslationStep'][] = [
+					'adjudication',
+					'admin',
+					'backward',
+					calculatedStep
+				];
+				const rightStep = rightSteps.includes(obj.translationProgress.translation_step);
+				if (rightStep) {
+					calculatedStep = obj.translationProgress.translation_step;
+				} else {
+					const row = obj.translationProgress;
+					row.translation_step = calculatedStep;
+					progressUpsert.push(row);
+				}
+			}
 
 			// * create a new acceptedInsert if missing
 			// Re-calculate Accepted Translation
@@ -79,7 +81,7 @@ export async function repairLink(version: string) {
 				const badId = reClacAT.translation_id != at?.translation_id;
 				const badScore = reClacAT.score != at?.score;
 				if (!at || badId || badScore) acceptedUpsert.push(reClacAT);
-			} else console.log('reClacAT == null', at, obj);
+			} else console.log("reClac null, couldn't find best translation.", {original: link[0][+id], translation:obj});
 		}
 	}
 

@@ -2,7 +2,6 @@
 	import { button } from '$lib/styles';
 	import { fly } from 'svelte/transition';
 	import { goto } from '$app/navigation';
-	import type { GithubLanguage } from '$lib/types';
 	import { exportToZip, exportToGit } from './controls/export/export';
 	import { AddArcVersionToLink } from './controls/githubToSupabaseNew';
 	import { getArcVersions } from './controls/getArcVersions';
@@ -10,6 +9,7 @@
 	import { pullLink, type LinkTranslation } from '$lib/utils/pullLink';
 	import type { Database } from '$lib/supabase/database.types';
 	import { supabase } from '../../supabaseClient';
+	import { update_link_from_arc } from '$lib/actions/update-link-from-arc';
 	let arcVersions: Promise<Record<string, string[]>> = $state(getArcVersions());
 	let selectedVersion = $derived(Object.keys(arcVersions)[0]);
 
@@ -27,7 +27,8 @@
 			review: 0
 		};
 
-		const userMap: Record<string, LinkTranslation[]> = {};
+		const userMap: Record<string, { translations: LinkTranslation[]; reviews: LinkTranslation[] }> =
+			{};
 
 		// i itterate throughout the translations
 		for (const language of Object.keys(link[1])) {
@@ -37,15 +38,15 @@
 				if (obj.forwardTranslations) {
 					for (const t of obj.forwardTranslations) {
 						if (t.user_id == null) continue;
-						if (!userMap[t.user_id]) userMap[t.user_id] = [];
-						userMap[t.user_id].push(obj);
+						if (!userMap[t.user_id]) userMap[t.user_id] = { translations: [], reviews: [] };
+						userMap[t.user_id].translations.push(obj);
 					}
 				}
 				if (obj.translationReviews) {
 					for (const t of obj.translationReviews) {
 						if (t.reviewer_id == null) continue;
-						if (!userMap[t.reviewer_id]) userMap[t.reviewer_id] = [];
-						userMap[t.reviewer_id].push(obj);
+						if (!userMap[t.reviewer_id]) userMap[t.reviewer_id] = { translations: [], reviews: [] };
+						userMap[t.reviewer_id].reviews.push(obj);
 					}
 				}
 				const step = obj.translationProgress?.translation_step;
@@ -62,7 +63,7 @@
 		console.log('userMap', userMap);
 		if (!users) return;
 		for (const id of Object.keys(users)) {
-			console.log(users[+id].name, id, userMap[users[+id].id]);
+			console.log(users[+id].name, userMap[users[+id].id]);
 		}
 	};
 </script>
@@ -91,13 +92,22 @@
 				  		border-blue-700 hover:bg-blue-700/20
 						dark:border-blue-600 dark:hover:bg-blue-600/20
 						"
+					onclick={async () => await update_link_from_arc()}
+				>
+					New Update LINK from ARC
+				</button>
+			</div>
+			<div class="sm:flex p-1.5 border-b border-inherit">
+				<button
+					title="Pull Lists from GitHub"
+					class=" w-1/3 mt-1 min-w-60 h-8 border-3 hover:shadow mr-2 font-semibold rounded-lg cursor-pointer
+						opacity-80 hover:opacity-100
+				  		border-blue-700 hover:bg-blue-700/20
+						dark:border-blue-600 dark:hover:bg-blue-600/20
+						"
 					onclick={async () => {
 						//if (selectedVersion) await UpdateFromARC(selectedVersion, versions[selectedVersion] as GithubLanguage[]);
-						if (selectedVersion)
-							await AddArcVersionToLink(
-								selectedVersion,
-								versions[selectedVersion] as GithubLanguage[]
-							);
+						if (selectedVersion) await AddArcVersionToLink(selectedVersion);
 						else console.error('no selected ARCH version');
 					}}
 				>

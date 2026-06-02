@@ -44,3 +44,9 @@ export function sortSegmentMap(original: SegmentMap): [number, SegmentData][] {
 
 	return sorted;
 }
+
+// env key helper
+export const env = (key: string) =>
+  typeof import.meta !== 'undefined' && import.meta.env
+    ? import.meta.env[key]
+    : process.env[key];

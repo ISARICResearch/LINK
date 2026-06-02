@@ -1,4 +1,4 @@
-import type { GithubLanguage, TranslationLanguage } from '$lib/types';
+import type { TranslationLanguage } from '$lib/types';
 
 import type {
 	AcceptedTranslationInsert,
@@ -443,7 +443,7 @@ async function HandleNewAcceptedTranslations(translations: ForwardTranslationRow
 	return insert.data;
 }
 
-export async function AddArcVersionToLink(version: string, _languages: GithubLanguage[]) {
+export async function AddArcVersionToLink(version: string) {
 	const startT = performance.now();
 	// = (1) = get all of Arc Translations for this version
 	const arcTranslations = await pullArcTranslations(version);

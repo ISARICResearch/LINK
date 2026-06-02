@@ -1,3 +1,4 @@
+import { env } from '$lib/utils/utils';
 import Papa from 'papaparse';
 
 // <T>
@@ -193,7 +194,7 @@ export async function pullArcTranslations(version: string) {
 	}
 
 	// + set github authentication and arch version we are looking for
-	const githubToken = import.meta.env.VITE_GITHUB_TOKEN;
+	const githubToken = env('VITE_GITHUB_TOKEN');
 	const githubAuth = { headers: { Authorization: `Bearer ${githubToken}` } };
 
 	// = ( 1 ) = Get list of files to download

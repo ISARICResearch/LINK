@@ -1,3 +1,5 @@
+import { env } from "$lib/utils/utils";
+
 export async function pushFolderToGitHub(
 	files: Record<string, string>, // path -> csv content
 	commitMessage: string,
@@ -5,7 +7,7 @@ export async function pushFolderToGitHub(
 	repo: string = 'ARC-Reviewed-Translations', //'ARC-Translations',
 	branch: string = 'main'
 ) {
-	const githubToken = import.meta.env.VITE_GITHUB_TOKEN_2;
+	const githubToken = env('VITE_GITHUB_TOKEN_2');
 	const auth = {
 		headers: {
 			Authorization: `Bearer ${githubToken}`,

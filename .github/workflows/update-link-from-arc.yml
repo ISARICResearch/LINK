@@ -1,0 +1,31 @@
+on:
+  schedule:
+    - cron: '0 9 * * 1'  
+  workflow_dispatch:
+
+jobs:
+  run-admin-task:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update Link from Arc
+        run: npx tsx src/lib/actions/update-link-from-arc.ts
+        env:
+          VITE_GITHUB_TOKEN: ${{ secrets.VITE_GITHUB_TOKEN }}
+          VITE_GITHUB_TOKEN_2: ${{ secrets.VITE_GITHUB_TOKEN_2 }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+    

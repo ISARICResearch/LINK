@@ -43,7 +43,7 @@
 		</h1>
 
 		<p class="text-center text-xl it p-6 font-serif">
-			Welcome, {profile.name}. <br />Thank you for your time and energy translating <b>ARC</b> into <b>{profile.language}</b>. <br />Your
+			Welcome, {profile.name}. <br />Thank you for your time and energy translating <b>ARC</b> into <b>{language}</b>. <br />Your
 			translations are helping people around the world!
 		</p>
 

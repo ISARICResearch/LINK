@@ -7,16 +7,64 @@
 	import { AddArcVersionToLink } from './controls/githubToSupabaseNew';
 	import { getArcVersions } from './controls/getArcVersions';
 	import { repairLink } from '$lib/utils/repairTranslations';
-	import { pullLink } from '$lib/utils/pullLink';
+	import { pullLink, type LinkTranslation } from '$lib/utils/pullLink';
+	import type { Database } from '$lib/supabase/database.types';
+	import { supabase } from '../../supabaseClient';
 	let arcVersions: Promise<Record<string, string[]>> = $state(getArcVersions());
 	let selectedVersion = $derived(Object.keys(arcVersions)[0]);
 
-	async function printStatus(version: string) {
+	const printStatus = async (version: string) => {
 		const link = await pullLink(version);
+		const profilesRequest = await supabase.from('profiles').select('*');
+		const users = profilesRequest.data;
 
-		for (const language of link)
+		const userModified: LinkTranslation[] = [];
+		const progressCounts: Record<Database['public']['Enums']['TranslationStep'], number> = {
+			adjudication: 0,
+			admin: 0,
+			backward: 0,
+			forward: 0,
+			review: 0
+		};
 
-	}
+		const userMap: Record<string, LinkTranslation[]> = {};
+
+		// i itterate throughout the translations
+		for (const language of Object.keys(link[1])) {
+			const l = language as Database['public']['Enums']['Language'];
+			for (const [_id, obj] of Object.entries(link[1][l])) {
+				if (obj.forwardTranslations?.find((t) => t.user_id != null)) userModified.push(obj);
+				if (obj.forwardTranslations) {
+					for (const t of obj.forwardTranslations) {
+						if (t.user_id == null) continue;
+						if (!userMap[t.user_id]) userMap[t.user_id] = [];
+						userMap[t.user_id].push(obj);
+					}
+				}
+				if (obj.translationReviews) {
+					for (const t of obj.translationReviews) {
+						if (t.reviewer_id == null) continue;
+						if (!userMap[t.reviewer_id]) userMap[t.reviewer_id] = [];
+						userMap[t.reviewer_id].push(obj);
+					}
+				}
+				const step = obj.translationProgress?.translation_step;
+				if (step) progressCounts[step] += 1;
+			}
+		}
+
+		// Count how many in each transaltion step
+		// Store translations made by humans
+		// Store reviews
+		console.log('userModified', userModified);
+		console.log('progressCounts', progressCounts);
+		console.log('users', users);
+		console.log('userMap', userMap);
+		if (!users) return;
+		for (const id of Object.keys(users)) {
+			console.log(users[+id].name, id, userMap[users[+id].id]);
+		}
+	};
 </script>
 
 {#await arcVersions}

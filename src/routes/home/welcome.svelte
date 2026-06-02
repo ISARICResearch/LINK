@@ -16,8 +16,17 @@
 		};
 	} = $props();
 
-	let started = $derived(new Date().toJSON().slice(0, 10) < profile.created_at.slice(0, 10));
-	let instructionsOpen = $derived(started.valueOf());
+
+	let weekOut = new Date().toJSON().slice(0, 8) + (+new Date().toJSON().slice(8, 10) + 7).toString(); 
+	let firstSteps = $derived(profile.created_at.slice(0, 10) < weekOut);
+	$inspect(
+		profile.created_at.slice(0, 10),
+		weekOut,
+		firstSteps,
+		"2026-06-01" < "2026-06-2"
+	);
+
+	let instructionsOpen = $derived(firstSteps.valueOf());
 
 	const language = $derived(capitalizeFirstLetter(profile.language ? profile.language : ''));
 </script>
@@ -34,7 +43,7 @@
 		</h1>
 
 		<p class="text-center text-xl it p-6 font-serif">
-			Welcome, {profile.name}. <br />Thank you for your time and energy translating ARC. <br />Your
+			Welcome, {profile.name}. <br />Thank you for your time and energy translating <b>ARC</b> into <b>{profile.language}</b>. <br />Your
 			translations are helping people around the world!
 		</p>
 
@@ -177,6 +186,16 @@
 								📘 User Guide
 							</a>
 							Full instructions on how to use LINK are written here.
+						</div>
+						<div class="pb-2 px-6 text-xl">
+							<a
+								target="_blank"
+								href="https://ucdenver.co1.qualtrics.com/jfe/form/SV_8Bcvg9YcrkRHkt8"
+								title="Video Tutorial"
+								class=" bg-stone-100 font-medium p-0.5 px-2 rounded-lg shadow-xs hover:bg-stone-50 hover:shadow-md cursor-pointer hover:underline"
+							>
+								📺 Video Tutorial</a
+							> A video explaining how to use LINK.
 						</div>
 						<div class="pb-4 px-6 text-xl">
 							<a

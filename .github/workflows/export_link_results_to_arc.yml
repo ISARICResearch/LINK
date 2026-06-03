@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update Arc from Link
-        run: npx tsx src/lib/actions/update-arc-from-link.ts
+      - name: Export Link Results To Arc
+        run: npx tsx src/lib/actions/export_link_results_to_arc.ts
         env:
           VITE_GITHUB_TOKEN: ${{ secrets.VITE_GITHUB_TOKEN }}
           VITE_GITHUB_TOKEN_2: ${{ secrets.VITE_GITHUB_TOKEN_2 }}

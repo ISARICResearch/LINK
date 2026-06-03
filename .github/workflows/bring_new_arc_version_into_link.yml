@@ -1,6 +1,6 @@
 on:
-  schedule:
-    - cron: '0 3 * * 5'  
+  repository_dispatch:
+    types: [arc-translations-updated]  
   workflow_dispatch:
 
 
@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update Link from Arc
-        run: npx tsx src/lib/actions/update-link-from-arc.ts
+      - name: Bring New Arc Version Into Link
+        run: npx tsx src/lib/actions/bring_new_arc_version_into_link.ts
         env:
           VITE_GITHUB_TOKEN: ${{ secrets.VITE_GITHUB_TOKEN }}
           VITE_GITHUB_TOKEN_2: ${{ secrets.VITE_GITHUB_TOKEN_2 }}

@@ -9,7 +9,11 @@
 	import { pullLink, type LinkTranslation } from '$lib/utils/pullLink';
 	import type { Database } from '$lib/supabase/database.types';
 	import { supabase } from '../../supabaseClient';
-	import { update_link_from_arc } from '$lib/actions/update-link-from-arc';
+	import {
+		bring_new_arc_version_into_link,
+		export_link_results_to_arc
+	} from '$lib/actions/actions';
+	//import { update_link_from_arc } from '$lib/actions/update-link-from-arc';
 	let arcVersions: Promise<Record<string, string[]>> = $state(getArcVersions());
 	let selectedVersion = $derived(Object.keys(arcVersions)[0]);
 
@@ -92,9 +96,20 @@
 				  		border-blue-700 hover:bg-blue-700/20
 						dark:border-blue-600 dark:hover:bg-blue-600/20
 						"
-					onclick={async () => await update_link_from_arc()}
+					onclick={async () => await bring_new_arc_version_into_link()}
 				>
-					New Update LINK from ARC
+					bring_new_arc_version_into_link
+				</button>
+				<button
+					title="Pull Lists from GitHub"
+					class=" w-1/3 mt-1 min-w-60 h-8 border-3 hover:shadow mr-2 font-semibold rounded-lg cursor-pointer
+						opacity-80 hover:opacity-100
+				  		border-blue-700 hover:bg-blue-700/20
+						dark:border-blue-600 dark:hover:bg-blue-600/20
+						"
+					onclick={async () => await export_link_results_to_arc()}
+				>
+					export_link_results_to_arc
 				</button>
 			</div>
 			<div class="sm:flex p-1.5 border-b border-inherit">

@@ -8,7 +8,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   
 jobs:
-  update-arc-from-link:
+  export_link_results_to_arc:
     runs-on: ubuntu-latest
 
     steps:

@@ -157,7 +157,7 @@ export const modifyArcFromLink = async (
 	for (const language in link) {
 		// + get language with first letter uppercase
 		const langArc = language.charAt(0).toUpperCase() + language.slice(1);
-
+		
 		// ! catch if section is missing
 		if (
 			!arc[v]['English'] ||
@@ -169,7 +169,7 @@ export const modifyArcFromLink = async (
 			!arc[v][langArc]['Lists'] ||
 			!arc[v][langArc]['paper_like_details.csv']
 		) {
-			console.error('missing section', arc[v], langArc);
+			console.error('updateArcFromLink; missing data', arc[v], langArc);
 			continue;
 		}
 
@@ -185,7 +185,7 @@ export const modifyArcFromLink = async (
 
 			// ! catch if no segment
 			if (!segment) {
-				console.error('missing original segment #' + oId, linkTranslation);
+				console.error('updateArcFromLink; missing original segment #' + oId, linkTranslation);
 				continue;
 			}
 
@@ -195,7 +195,7 @@ export const modifyArcFromLink = async (
 
 			// ! catch if getting accepted translation or score failed
 			if (errorMessage) {
-				console.error(errorMessage);
+				console.error('updateArcFromLink; processLinkTranslation error', errorMessage);
 				continue;
 			}
 
@@ -203,12 +203,12 @@ export const modifyArcFromLink = async (
 			if (['question', 'completionGuide', 'definition'].includes(segment.type)) {
 				// ! catch if missing variable name
 				if (!segment.location || segment.location.length < 1) {
-					console.error('missing location', segment);
+					console.error('updateArcFromLink; missing location', segment);
 					continue;
 				}
 
 				if (!arc[v][langArc]['ARCH.csv']) {
-					console.error('cant find arch.csv', arc[v][langArc]);
+					console.error('updateArcFromLink; cant find arch.csv', arc[v][langArc]);
 					continue;
 				}
 
@@ -220,7 +220,14 @@ export const modifyArcFromLink = async (
 				const variable = segment.location.at(-1) as string;
 
 				if (!arc[v][langArc]['ARCH.csv'][variable]) {
-					console.warn('missing variable', variable, column, arc[v][langArc]['ARCH.csv'][variable]);
+					console.warn(
+						'updateArcFromLink; missing variable',
+						v,
+						langArc,
+						column,
+						variable,
+						arc[v][langArc]['ARCH.csv']
+					);
 					continue;
 				}
 
@@ -237,7 +244,7 @@ export const modifyArcFromLink = async (
 			if (segment.type == 'listItem') {
 				// ! catch if missing variable name
 				if (!segment.location || segment.location.length < 1) {
-					console.error('missing location', segment);
+					console.error('updateArcFromLink; missing location', segment);
 					continue;
 				}
 

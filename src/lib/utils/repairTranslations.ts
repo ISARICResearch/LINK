@@ -66,6 +66,7 @@ export async function repairLink(version: string) {
 				} else {
 					const row = obj.translationProgress;
 					row.translation_step = calculatedStep;
+					console.log('progressUpsert', row);
 					progressUpsert.push(row);
 				}
 			}
@@ -81,7 +82,11 @@ export async function repairLink(version: string) {
 				const badId = reClacAT.translation_id != at?.translation_id;
 				const badScore = reClacAT.score != at?.score;
 				if (!at || badId || badScore) acceptedUpsert.push(reClacAT);
-			} else console.log("reClac null, couldn't find best translation.", {original: link[0][+id], translation:obj});
+			} else
+				console.log("reClac null, couldn't find best translation.", {
+					original: link[0][+id],
+					translation: obj
+				});
 		}
 	}
 
@@ -95,10 +100,27 @@ export async function repairLink(version: string) {
 
 	if (acceptedUpsert.length > 0) {
 		console.log('acceptedUpsert', acceptedUpsert);
+		const inserts = acceptedUpsert.filter((r): r is AcceptedTranslationInsert => r.id === undefined);
+		const updates = acceptedUpsert.filter((r): r is AcceptedTranslationRow => r.id !== undefined);
+
+		if (inserts.length > 0) {
+			const { error } = await supabase.from('accepted_translations').insert(inserts);
+			if (error) return error;
+		}
+
+		if (updates.length > 0) {
+			const { error } = await supabase
+				.from('accepted_translations')
+				.upsert(updates, { onConflict: 'id' });
+			if (error) return error;
+		}
+		/*  - old code -
+
 		const { error: acceptedError } = await supabase
 			.from('accepted_translations')
-			.insert(acceptedUpsert);
-		if (acceptedError) console.error('Error inserting accepted translations', acceptedError);
+			.upsert(acceptedUpsert as AcceptedTranslationInsert[], { onConflict: 'id' });
+		if (acceptedError) console.error('Error upserting accepted translations', acceptedError); // line 102
+		*/
 	}
 
 	const endT = performance.now();

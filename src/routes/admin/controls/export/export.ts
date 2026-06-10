@@ -80,7 +80,7 @@ export async function exportToZip(version: string) {
 	// ( 3 ) modify Arc-Translations
 	const modifiedArc = await modifyArcFromLink(formattedArc, segments, translationData);
 
-	console.log('modifiedArc', modifiedArc);
+	//console.log('modifiedArc', modifiedArc);
 
 	// ( 4 ) ZIP folder
 	const zipUrl = await zipFolderTree(modifiedArc);
@@ -103,11 +103,11 @@ export async function exportToGit(version: string) {
 	// ( 3 ) modify Arc-Translations
 	const modifiedArc = await modifyArcFromLink(formattedArc, segments, translationData);
 
-	console.log('modifiedArc', modifiedArc);
+	//console.log('modifiedArc', modifiedArc);
 
 	const files = flattenArcToFiles(modifiedArc);
 
-	console.log('files', files);
+	//console.log('files', files);
 
 	pushFolderToGitHub(files, `Update ARCH${version} translations`);
 }

@@ -153,11 +153,29 @@ export const modifyArcFromLink = async (
 	// + store english arc of this version
 	const arcEnglish = arc[v]['English'];
 
+	/*
+	if (arcEnglish['ARCH.csv']) {
+		const arc_variables = Object.keys(arcEnglish['ARCH.csv']);
+		//console.log('arc_variables', arc_variables);
+		const link_variables = new Set<string>();
+		for (const s of Object.values(segments)) {
+			const loc = s.location;
+			if (loc) {
+				if (loc[0] == 'ARC') {
+					if (loc.at(-1) && !loc.at(-1)?.includes(' ')) {
+						link_variables.add(loc.at(-1) as string);
+					}
+				}
+			}
+		}
+		//console.log('link_variables', link_variables);
+	}*/
+
 	// %% for language translated in link
 	for (const language in link) {
 		// + get language with first letter uppercase
 		const langArc = language.charAt(0).toUpperCase() + language.slice(1);
-		
+
 		// ! catch if section is missing
 		if (
 			!arc[v]['English'] ||
@@ -169,7 +187,7 @@ export const modifyArcFromLink = async (
 			!arc[v][langArc]['Lists'] ||
 			!arc[v][langArc]['paper_like_details.csv']
 		) {
-			console.error('updateArcFromLink; missing data', arc[v], langArc);
+			//console.error('updateArcFromLink; missing data', arc[v], langArc);
 			continue;
 		}
 
@@ -195,7 +213,7 @@ export const modifyArcFromLink = async (
 
 			// ! catch if getting accepted translation or score failed
 			if (errorMessage) {
-				console.error('updateArcFromLink; processLinkTranslation error', errorMessage);
+				//console.error('updateArcFromLink; processLinkTranslation error', errorMessage);
 				continue;
 			}
 
@@ -220,6 +238,7 @@ export const modifyArcFromLink = async (
 				const variable = segment.location.at(-1) as string;
 
 				if (!arc[v][langArc]['ARCH.csv'][variable]) {
+					/*
 					console.warn(
 						'updateArcFromLink; missing variable',
 						v,
@@ -227,7 +246,7 @@ export const modifyArcFromLink = async (
 						column,
 						variable,
 						arc[v][langArc]['ARCH.csv']
-					);
+					);*/
 					continue;
 				}
 
@@ -387,7 +406,7 @@ export const modifyArcFromLink = async (
 				//console.log(ao_array);
 				if (!ao_array[i]) continue;
 				if (!answerMap[ao_array[i].trim()]) {
-					console.warn('Answer Map missing |' + ao_array[i].trim() + '|');
+					//console.warn('Answer Map missing |' + ao_array[i].trim() + '|');
 					continue;
 				}
 

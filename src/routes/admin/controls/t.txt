@@ -1,9 +1,7 @@
-import type { DocumentInsert, OriginalSegmentRow } from '$lib/supabase/types';
+import type { DocumentInsert, DocumentUpdate, OriginalSegmentRow } from '$lib/supabase/types';
 import _ from 'lodash';
 import { supabase } from '../../../supabaseClient';
 import { GetArcPresets } from './findArcPresets';
-import type { ArcStructure } from './export/pullArcTranslations';
-//import { ListsEnglishToInsert } from './arcSegmentInsert';
 
 async function PullAllDocumentData() {
 	console.log('Pull Documnets...');
@@ -13,23 +11,16 @@ async function PullAllDocumentData() {
 	return documents.data;
 }
 
-export async function HandleDocumentInsert(
-	version: string,
-	segments: OriginalSegmentRow[],
-	_arc: ArcStructure
-) {
+export async function HandleDocumentInsert(version: string, segments: OriginalSegmentRow[]) {
 	// = (1) = Pull existing documents
 	const existingDocuments = await PullAllDocumentData();
 	if (!existingDocuments) return;
 
 	// = (2) = Get documents to insert
-	//const filteredSegments: OriginalSegmentRow[] = GetSegmentsInArc(segments, arc);
-	//console.log('segments', segments);
-	//console.log('filteredSegments', filteredSegments);
 	const documentsMaybeInsert = await CreateDocumentInserts(version, segments);
 	if (!documentsMaybeInsert) return;
 
-	const documentsToUpdate: DocumentInsert[] = [];
+	const documentsToUpdate: DocumentUpdate[] = [];
 	const documentsToInsert: DocumentInsert[] = [];
 
 	// = (3) = Handle if document exists, update it, otherwise insert it as new
@@ -46,7 +37,6 @@ export async function HandleDocumentInsert(
 		// # otherwise, let's update the existing document with a union of original ids
 		const existingIds = new Set(existingDoc.original_ids);
 		const newIds = new Set(insert.original_ids);
-
 		//const allIds = new Set([...existingIds, ...newIds]); // @ removed, ids may have been removed, just use the ones found.
 		if (existingIds == newIds) continue; // ! skip if no change upon adding newIds
 		const idArray = Array.from(newIds);
@@ -71,19 +61,15 @@ export async function HandleDocumentInsert(
 	}
 }
 
-// @ AIDAN LOOK HERE
 async function CreateDocumentInserts(version: string, segments: OriginalSegmentRow[]) {
+	//console.log('Create Documents: ', version);
+	//console.log('existingSegments', segments);
+
 	if (segments.length == 0) return;
 
 	// = (1) = Get arc presets to assign to documents
 	const [arcPresetMap, listsPresetMap] = await GetArcPresets(version);
-	console.log('arcPresetMap', arcPresetMap);
 	console.log('listsPresetMap', listsPresetMap);
-
-	/*
-	get arc -> arch -> variable names as Set()
-	When it adds any one variable to  the document, first check if it is in my set of arc variables. If not, skip.
-	*/
 
 	// if variable_id == [], add simply to "ARC"
 	// if variable_id == [preset_name], add to document titled "preset_name"
@@ -177,51 +163,3 @@ async function CreateDocumentInserts(version: string, segments: OriginalSegmentR
 
 	return documentInserts;
 }
-
-/*
-const GetSegmentsInArc = (
-	segments: OriginalSegmentRow[],
-	arc: ArcStructure
-): OriginalSegmentRow[] => {
-	return [];
-	const getArcSegments = (): OriginalSegmentRow[] => {
-		const arcVariables = arc['ARCH.csv'];
-		if (!arcVariables) return [];
-		const _variableNames = Object.keys(arcVariables);
-
-		return segments.filter((_s) => {
-			/*
-			if ([question].includes(s.type)) const v = s.location?.at(-1);
-			if (!v) return false;
-			if (variableNames.includes(v)) if (s) return true;
-			if (v.includes(' ')) return true;*/
-			// @ AIDAN COME BACK - this makes all labels always add, so long as they were in the document. But maybe we don't want that?
-			/*return false;
-		});
-	};
-
-	const archSegments = getArcSegments();
-
-	const getListSegments = (): OriginalSegmentRow[] => {
-		const lists = arc.Lists;
-		if (!lists) return [];
-		const inserts = ListsEnglishToInsert(lists);
-
-		return segments.filter((s) => {
-			const sLoc = s.location;
-			if (!sLoc) return false;
-			for (const insert of inserts) {
-				const iloc = insert.location;
-				if (!iloc) return false;
-				if (_.isEqual(iloc, sLoc)) return true;
-			}
-			// @ AIDAN COME BACK - this makes all labels always add, so long as they were in the document. But maybe we don't want that?
-			return false;
-		});
-	};
-
-	const listSegments = getListSegments();
-
-	const allSegments = [...archSegments, ...listSegments];
-	return allSegments;
-};*/

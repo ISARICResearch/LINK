@@ -18,7 +18,11 @@ import _ from 'lodash';
 import type { Database } from '$lib/supabase/database.types';
 import { ArcEnglishToInsert, ListsEnglishToInsert, PLDEnglishToInsert } from './arcSegmentInsert';
 import { HandleDocumentInsert } from './arcDocumentInsert';
-import { pullLink, type LinkSegments, type LinkTranslationsRecord } from '../../../lib/utils/pullLink';
+import {
+	pullLink,
+	type LinkSegments,
+	type LinkTranslationsRecord
+} from '../../../lib/utils/pullLink';
 
 // Handle
 async function HandleArcOriginalSegments(
@@ -73,7 +77,7 @@ async function HandleArcOriginalSegments(
 		else segmentsToInsert.push(insert);
 	}
 
-	console.log(' .. segmentsInLink', segmentsInLink);
+	//console.log(' .. segmentsInLink', segmentsInLink);
 	/*
 	// @ For testing
 	const practiceSegmentsToInsert = segmentsToInsert.slice(0, 100);
@@ -185,7 +189,6 @@ async function HandleNewForwardTranslations(
 					continue;
 				}
 
-				
 				if (!tRow[column]) {
 					failedSegments.push([
 						ns,
@@ -257,7 +260,7 @@ async function HandleNewForwardTranslations(
 				if (!archcsv) continue;
 				const tRow = Object.values(archcsv)[index];
 				if (!tRow) {
-					console.log(archcsv, index)	
+					console.log(archcsv, index);
 					continue;
 				}
 
@@ -450,22 +453,27 @@ export async function AddArcVersionToLink(version: string) {
 	const arcT = arcTranslations['ARCH' + version];
 
 	// = (2) = get all of link data
-	const [segments, translationData] = await pullLink(version);
+	const [linkSegments, translationData] = await pullLink(version);
 
 	// = (3) = Get which segments already existed and new ones pushed
 	const [existingSegments, newSegments] = await HandleArcOriginalSegments(
 		arcT['English'],
-		segments
+		linkSegments
 	);
+
+
+	//const segments = [...Object.values(existingSegments), ...newSegments];
+
+
+	//return;
 
 	// = (4) = find Arc-Translations for new segments and push them
 	const newTranslations = await HandleNewForwardTranslations(arcT, newSegments, translationData);
 	console.log('translationsToInsert', newTranslations);
 
-
 	// = (5, a) = check if existingSegments have progresses in link
-	console.log("5a existingSegments", existingSegments)
-	console.log("5a Link", [segments, translationData])
+	console.log('5a existingSegments', existingSegments);
+	console.log('5a Link', [linkSegments, translationData]);
 
 	// = (5, b) = for translations, create translation progress row
 	const newProgresses = await HandleNewProgresses(newTranslations);
@@ -480,8 +488,18 @@ export async function AddArcVersionToLink(version: string) {
 	if (Object.values(existingSegments)) allSegments.push(...Object.values(existingSegments));
 	if (newSegments) allSegments.push(...newSegments);
 
-	await HandleDocumentInsert(version, allSegments);
+	console.log('allSegments', allSegments);
+	console.log('existingSegments', Object.keys(existingSegments));
+	console.log('newSegments', newSegments);
+	
+
+	// @ AIDAN LOOK HERE: we need to get all original ids that are in arcT['English'] to push into the documents.
+	// go to CreateDocumentInserts... it will show you the way
+
+	// Wait, that is literally what I am trying to do above.
+
+	await HandleDocumentInsert(version, allSegments, arcT['English']);
 
 	const endT = performance.now();
-	console.log('Done! in ' + String((endT - startT)/1000) + 's');
+	console.log('Done! in ' + String((endT - startT) / 1000) + 's');
 }

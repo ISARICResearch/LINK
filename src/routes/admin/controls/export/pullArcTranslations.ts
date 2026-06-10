@@ -200,7 +200,7 @@ export async function pullArcTranslations(version: string) {
 	// = ( 1 ) = Get list of files to download
 	console.log('arcT: Find Files');
 	const archFiles = await findFiles(version, githubAuth);
-	console.log('archFiles', archFiles);
+	//console.log('archFiles', archFiles);
 
 	// = ( 2 ) = Download all files
 	console.log('arcT: Fetch Files');

@@ -18,7 +18,7 @@ export async function MapArchToForwardTranslationInsert(
 		([variable, targetDetails]) => {
 			const englishDetails = archEnglish[variable];
 			if (!englishDetails) {
-				console.warn(`No English match found for entry: ${variable}`);
+				//console.warn(`No English match found for entry: ${variable}`);
 				return [];
 			}
 			variable = variable.trim();

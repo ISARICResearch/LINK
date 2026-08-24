@@ -90,10 +90,17 @@ async function parseCSVs(content: Record<string, string>) {
 		// * parse using header and skipping empty lines
 		const parsedCsv = Papa.parse(content[path], parseConfig);
 		// ! catch any parse errors
-		if (parsedCsv.errors.length > 0) throw new Error(`Error parsing ${path}: ${parsedCsv.errors}`);
+		if (parsedCsv.errors.length > 0) {
+			console.warn(`Error parsing ${path}:`, parsedCsv.errors);
+			//throw new Error(`Error parsing ${path}: ${JSON.stringify(parsedCsv.errors)}`);}
+			continue
+		}
+			
 		// = map it to content
 		parsedContent[path] = parsedCsv.data;
 	}
+
+	//throw new Error(`Breaking this to not store whatever comes`);
 	return parsedContent;
 }
 

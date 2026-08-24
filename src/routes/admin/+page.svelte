@@ -13,9 +13,21 @@
 		bring_new_arc_version_into_link,
 		export_link_results_to_arc
 	} from '$lib/actions/actions';
+	import { onMount } from 'svelte';
+
 	//import { update_link_from_arc } from '$lib/actions/update-link-from-arc';
 	let arcVersions: Promise<Record<string, string[]>> = $state(getArcVersions());
+	//let linkVersions: Promise<Record<string, string[]>> = $state();
 	let selectedVersion = $derived(Object.keys(arcVersions)[0]);
+
+	const getLinkVersions = async() => {
+		return await supabase.from('documents').select('version').eq('title', 'ARC');
+	}
+
+	onMount(async()=>{
+		const lVersions = await getLinkVersions();
+		console.log(lVersions);
+	})
 
 	const printStatus = async (version: string) => {
 		const link = await pullLink(version);
@@ -71,6 +83,19 @@
 		}
 	};
 </script>
+
+<!--
+{#await linkVersions}
+	<p>awaiting link</p>
+{:then lVersions} 
+	{lVersions}
+	{#each Object.keys(lVersions) as k}
+		{k}
+	{/each}
+	{#each Object.values(lVersions) as v}
+		{v}
+	{/each}
+{/await}-->
 
 {#await arcVersions}
 	<p>Retrieving versions of arc...</p>

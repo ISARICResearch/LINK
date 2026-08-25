@@ -1,0 +1,154 @@
+import type { OriginalSegmentRow, SegmentMap } from '$lib/supabase/types';
+import { createLabel, createSlug } from './slug';
+
+export interface LocationNode {
+	name: string;
+	slug: string;
+	children: Map<string, LocationNode>;
+	segmentIds: number[];
+	tag: string;
+	completion: LocationCompletion;
+}
+
+export interface LocationCompletion {
+	forwardComplete: number;
+	reviewComplete: number;
+	backwardComplete: number;
+	forwardNeeded: number;
+	reviewNeeded: number;
+	backwardNeeded: number;
+}
+
+export function buildLocationTree(segments: OriginalSegmentRow[]): LocationNode {
+	const root: LocationNode = {
+		name: 'root',
+		slug: '',
+		children: new Map(),
+		segmentIds: [],
+		tag: '',
+		completion: {
+			forwardComplete: 0,
+			reviewComplete: 0,
+			backwardComplete: 0,
+			forwardNeeded: 0,
+			reviewNeeded: 0,
+			backwardNeeded: 0
+		}
+	};
+
+	const answer_options: Record<string, OriginalSegmentRow> = {};
+
+	segments.forEach((segment) => {
+		if (segment.type == 'answerOption') {
+			answer_options[segment.segment] = segment;
+		}
+	});
+
+	segments.forEach((segment) => {
+		if (!segment.location || segment.location.length === 0) return;
+
+		let currentNode = root;
+
+		// Build path through tree
+		segment.location.forEach((locationName, index) => {
+			const slug = createSlug(locationName);
+			const label = createLabel(locationName);
+
+			if (!currentNode.children.has(slug)) {
+				currentNode.children.set(slug, {
+					name: label,
+					slug: slug,
+					children: new Map(),
+					segmentIds: [],
+					tag: '',
+					completion: {
+						forwardComplete: 0,
+						reviewComplete: 0,
+						backwardComplete: 0,
+						forwardNeeded: 0,
+						reviewNeeded: 0,
+						backwardNeeded: 0
+					}
+				});
+			}
+
+			currentNode = currentNode.children.get(slug)!;
+
+			// Add segment to the deepest node in its path
+			if (index === segment.location!.length - 1) {
+				currentNode.segmentIds.push(segment.id);
+				// * replace name with question if question is there
+				if (segment.type === 'question' && segment.segment) {
+					currentNode.name = segment.segment;
+				}
+				// * add tag to labels
+				if (segment.type == 'formLabel') {
+					currentNode.tag = 'formLabel';
+					//console.log('formNode', currentNode);
+				}
+
+				if (segment.type == 'sectionLabel') {
+					currentNode.tag = 'sectionLabel';
+					//console.log('  sectionNode', currentNode);
+				}
+				// Add answer options if this is a question with them
+				if (
+					segment.type === 'question' &&
+					segment.answer_options &&
+					segment.answer_options.length > 0
+				) {
+					segment.answer_options.forEach((optionText) => {
+						const answerOption = answer_options[optionText];
+						if (answerOption) {
+							currentNode.segmentIds.push(answerOption.id);
+						}
+					});
+				}
+			}
+		});
+	});
+
+	return root;
+}
+
+export function computeCompletion(node: LocationNode, segmentMap: SegmentMap): LocationCompletion {
+	// Get all relevant segment IDs (including descendants)
+	const allIds = getAllDescendantIds(node);
+
+	const completion: LocationCompletion = {
+		forwardComplete: 0,
+		reviewComplete: 0,
+		backwardComplete: 0,
+		forwardNeeded: 0,
+		reviewNeeded: 0,
+		backwardNeeded: 0
+	};
+
+	allIds.forEach((id) => {
+		const segment = segmentMap[id];
+		if (!segment) return;
+
+		// Check completed steps
+		if (segment.forwardTranslation) completion.forwardComplete++;
+		if (segment.translationReview) completion.reviewComplete++;
+		// @ add backward translation here
+
+		//
+		if (segment.translationProgress) {
+			if (!segment.forwardTranslation && segment.translationProgress.translation_step == 'forward')
+				completion.forwardNeeded++;
+			if (!segment.translationReview && segment.translationProgress.translation_step == 'review')
+				completion.reviewNeeded++;
+		}
+	});
+
+	return completion;
+}
+
+function getAllDescendantIds(node: LocationNode): Set<number> {
+	const ids: Set<number> = new Set(node.segmentIds);
+	node.children.forEach((child) => {
+		getAllDescendantIds(child).forEach((id) => ids.add(id));
+	});
+	return ids;
+}

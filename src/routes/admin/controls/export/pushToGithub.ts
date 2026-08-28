@@ -4,7 +4,7 @@ export async function pushFolderToGitHub(
 	files: Record<string, string>, // path -> csv content
 	commitMessage: string,
 	owner: string = 'aidanmarler', //'ISARICResearch',
-	repo: string = 'ARC-Reviewed-Translations', //'ARC-Translations',
+	repo: string = 'ARC-Translations', //'ARC-Translations',
 	branch: string = 'main'
 ) {
 	const githubToken = env('VITE_GITHUB_TOKEN_2');

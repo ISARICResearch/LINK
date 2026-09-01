@@ -1,6 +1,6 @@
 import { env } from '$lib/utils/utils';
 import Papa from 'papaparse';
-const githubToken = env('VITE_GITHUB_TOKEN');
+const githubToken = env('ARC_GITHUB_TOKEN');
 
 export async function GetArcPresets(
 	version: string

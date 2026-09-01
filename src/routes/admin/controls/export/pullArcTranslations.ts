@@ -201,7 +201,7 @@ export async function pullArcTranslations(version: string) {
 	}
 
 	// + set github authentication and arch version we are looking for
-	const githubToken = env('VITE_GITHUB_TOKEN');
+	const githubToken = env('ARC_GITHUB_TOKEN');
 	const githubAuth = { headers: { Authorization: `Bearer ${githubToken}` } };
 
 	// = ( 1 ) = Get list of files to download

@@ -1,4 +1,4 @@
-name: Deploy Bridge to EC2
+name: Deploy LINK to EC2
 
 permissions:
   id-token: write
@@ -35,8 +35,11 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t isaric-bridge .
-          docker tag isaric-bridge:latest ${{ secrets.ECR_REPOSITORY }}:latest
+          docker build \
+            --build-arg VITE_SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}" \
+            --build-arg VITE_SUPABASE_ANON_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
+            -t link .
+          docker tag link:latest ${{ secrets.ECR_REPOSITORY }}:latest
           docker push ${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Deploy on EC2 via SSM Run Command
@@ -58,27 +61,29 @@ jobs:
 
               aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ECR_REPO}"
 
-              if docker container inspect isaric-bridge >/dev/null 2>&1; then
-                docker stop isaric-bridge >/dev/null 2>&1 || true
-                docker rm -fv isaric-bridge
+              if docker container inspect link >/dev/null 2>&1; then
+                docker stop link >/dev/null 2>&1 || true
+                docker rm -fv link
               fi
 
-              if docker container inspect isaric-bridge >/dev/null 2>&1; then
-                echo "Existing isaric-bridge container is still present after cleanup"
-                docker ps -a --filter "name=^/isaric-bridge$"
+              if docker container inspect link >/dev/null 2>&1; then
+                echo "Existing link container is still present after cleanup"
+                docker ps -a --filter "name=^/link$"
                 exit 1
               fi
 
               docker pull "${ECR_REPO}:latest"
-              docker run -d --restart unless-stopped --name isaric-bridge \
+              docker run -d --restart unless-stopped --name link \
                 --log-driver json-file --log-opt max-size=10m --log-opt max-file=3 \
-                -p 8050:8050 \
+                -p 3000:3000 \
+                -e ARC_GITHUB_TOKEN="${{ secrets.ARC_GITHUB_TOKEN }}" \
+                -e TRANSLATIONS_GITHUB_TOKEN="${{ secrets.TRANSLATIONS_GITHUB_TOKEN }}" \
                 "${ECR_REPO}:latest"
 
               sleep 3
-              if ! docker ps --filter "name=^/isaric-bridge$" --format '{{.Status}}' | grep -q .; then
+              if ! docker ps --filter "name=^/link$" --format '{{.Status}}' | grep -q .; then
                 echo "Container failed to start"
-                docker logs --tail 200 isaric-bridge || true
+                docker logs --tail 200 link || true
                 exit 1
               fi
 
@@ -117,7 +122,7 @@ jobs:
           CMD_ID=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Deploy isaric-bridge via GitHub Actions" \
+            --comment "Deploy LINK via GitHub Actions" \
             --parameters file:///tmp/ssm-params.json \
             --region eu-west-2 \
             --query 'Command.CommandId' --output text)

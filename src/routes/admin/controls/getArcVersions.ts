@@ -1,7 +1,7 @@
 import { env } from "$lib/utils/utils";
 
 export async function getArcVersions(): Promise<Record<string, string[]>> {
-	const githubToken = env('VITE_GITHUB_TOKEN');
+	const githubToken = env('ARC_GITHUB_TOKEN');
 	const response = await fetch(
 		`https://api.github.com/repos/ISARICResearch/ARC-Translations/contents`,
 		{

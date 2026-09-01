@@ -16,7 +16,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t \
+          docker build \
             --build-arg VITE_SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}" \
             --build-arg VITE_SUPABASE_ANON_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
             -t link .
@@ -24,8 +24,8 @@ jobs:
       - name: Run Docker container
         run: |
           docker run -d -p 3000:3000 \
-            -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-            -e GITHUB_TOKEN_2="${{ secrets.GITHUB_TOKEN_2 }}" \
+            -e ARC_GITHUB_TOKEN="${{ secrets.ARC_GITHUB_TOKEN }}" \
+            -e TRANSLATIONS_GITHUB_TOKEN="${{ secrets.TRANSLATIONS_GITHUB_TOKEN }}" \
             --name link link
 
       - name: Wait for container to be ready

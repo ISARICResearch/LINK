@@ -1,0 +1,148 @@
+name: Deploy Bridge to EC2
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Assume AWS IAM Role
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+          role-session-name: GitHubActionsDeploy
+
+      - name: Verify AWS Credentials
+        run: aws sts get-caller-identity
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+
+      - name: Verify ECR Repository Exists
+        run: |
+          aws ecr describe-repositories --repository-names $(echo ${{ secrets.ECR_REPOSITORY }} | awk -F'/' '{print $NF}') --region eu-west-2
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t isaric-bridge .
+          docker tag isaric-bridge:latest ${{ secrets.ECR_REPOSITORY }}:latest
+          docker push ${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Deploy on EC2 via SSM Run Command
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
+          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${INSTANCE_ID:-}" ]; then
+            echo "EC2_INSTANCE_ID is empty. Set secrets.EC2_INSTANCE_ID."
+            exit 1
+          fi
+
+          # 1) write the indented heredoc to a temp file (keeps linter happy)
+          cat > /tmp/ssm-script.indented <<INDENTED
+              #!/bin/bash -eux
+              trap 'echo "Error on line \$LINENO"; exit 1' ERR
+
+              aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ECR_REPO}"
+
+              if docker container inspect isaric-bridge >/dev/null 2>&1; then
+                docker stop isaric-bridge >/dev/null 2>&1 || true
+                docker rm -fv isaric-bridge
+              fi
+
+              if docker container inspect isaric-bridge >/dev/null 2>&1; then
+                echo "Existing isaric-bridge container is still present after cleanup"
+                docker ps -a --filter "name=^/isaric-bridge$"
+                exit 1
+              fi
+
+              docker pull "${ECR_REPO}:latest"
+              docker run -d --restart unless-stopped --name isaric-bridge \
+                --log-driver json-file --log-opt max-size=10m --log-opt max-file=3 \
+                -p 8050:8050 \
+                "${ECR_REPO}:latest"
+
+              sleep 3
+              if ! docker ps --filter "name=^/isaric-bridge$" --format '{{.Status}}' | grep -q .; then
+                echo "Container failed to start"
+                docker logs --tail 200 isaric-bridge || true
+                exit 1
+              fi
+
+              docker image prune -f
+              docker volume prune -f
+          INDENTED
+
+          # 2) dedent it to the real script file using Python (atomic write)
+          python3 - <<'PY' > /tmp/ssm-script.sh
+          import sys, textwrap
+          text = open('/tmp/ssm-script.indented', 'r').read()
+          print(textwrap.dedent(text), end='')
+          PY
+
+          # remove the indented temporary (optional)
+          rm -f /tmp/ssm-script.indented
+
+          chmod +x /tmp/ssm-script.sh
+          echo "Wrote /tmp/ssm-script.sh ($(wc -c < /tmp/ssm-script.sh) bytes)"
+
+          # Convert to SSM params JSON
+          python3 - <<'PY' > /tmp/ssm-params.json
+          import json
+          lines = open('/tmp/ssm-script.sh','r').read().splitlines()
+          print(json.dumps({"commands": lines}))
+          PY
+
+          echo "Wrote /tmp/ssm-params.json ($(wc -c < /tmp/ssm-params.json) bytes)"
+          echo "===== DEBUG: /tmp/ssm-script.sh ====="
+          sed 's/^/| /' /tmp/ssm-script.sh
+          echo "===== DEBUG: /tmp/ssm-params.json ====="
+          cat /tmp/ssm-params.json
+          echo "===== END DEBUG ====="
+
+          # Send the command and capture CommandId
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy isaric-bridge via GitHub Actions" \
+            --parameters file:///tmp/ssm-params.json \
+            --region eu-west-2 \
+            --query 'Command.CommandId' --output text)
+
+          echo "Sent SSM command: $CMD_ID -> instance $INSTANCE_ID"
+
+          # Poll for status
+          for i in $(seq 1 30); do
+            STATUS=$(aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" --query 'Status' --output text --region eu-west-2 2>/dev/null || true)
+            echo "[$i] SSM status: ${STATUS:-Pending/NotReady}"
+            if [ "$STATUS" = "Success" ]; then
+              echo "SSM command succeeded"
+              exit 0
+            fi
+            if [ "$STATUS" = "Failed" ] || [ "$STATUS" = "Cancelled" ] || [ "$STATUS" = "TimedOut" ]; then
+              echo "SSM command failed with status $STATUS"
+              echo "=== Stdout ==="
+              aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" --query 'StandardOutputContent' --output text --region eu-west-2 || true
+              echo "=== Stderr ==="
+              aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" --query 'StandardErrorContent' --output text --region eu-west-2 || true
+              exit 1
+            fi
+            sleep 5
+          done
+
+          echo "Timed out waiting for SSM command to succeed (last status: ${STATUS:-unknown})"
+          aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" --query 'StandardErrorContent' --output text --region eu-west-2 || true
+          exit 1

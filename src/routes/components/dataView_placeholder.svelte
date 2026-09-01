@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CompletionReport } from '$lib/types';
 	import { fade } from 'svelte/transition';
+
 	type Options = {
 		showKey?: boolean;
 		large?: boolean;

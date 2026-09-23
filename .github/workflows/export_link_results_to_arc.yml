@@ -27,7 +27,7 @@ jobs:
       - name: Export Link Results To Arc
         run: npx tsx src/lib/actions/export_link_results_to_arc.ts
         env:
-          ARC_GITHUB_TOKEN: ${{ secrets.ARC_GITHUB_TOKEN }}
-          TRANSLATIONS_GITHUB_TOKEN: ${{ secrets.TRANSLATIONS_GITHUB_TOKEN }}
+          ARC_SOURCES_READ_TOKEN: ${{ secrets.ARC_SOURCES_READ_TOKEN }}
+          ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}

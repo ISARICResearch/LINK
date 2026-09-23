@@ -7,7 +7,7 @@ export async function pushFolderToGitHub(
 	repo: string = 'ARC-Translations', //'ARC-Translations',
 	branch: string = 'main'
 ) {
-	const githubToken = env('TRANSLATIONS_GITHUB_TOKEN');
+	const githubToken = env('ARC_TRANSLATIONS_PR_TOKEN');
 	const auth = {
 		headers: {
 			Authorization: `Bearer ${githubToken}`,

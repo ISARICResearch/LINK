@@ -24,8 +24,8 @@ jobs:
       - name: Run Docker container
         run: |
           docker run -d -p 3000:3000 \
-            -e ARC_GITHUB_TOKEN="${{ secrets.ARC_GITHUB_TOKEN }}" \
-            -e TRANSLATIONS_GITHUB_TOKEN="${{ secrets.TRANSLATIONS_GITHUB_TOKEN }}" \
+            -e ARC_SOURCES_READ_TOKEN="${{ secrets.ARC_SOURCES_READ_TOKEN }}" \
+            -e ARC_TRANSLATIONS_PR_TOKEN="${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}" \
             --name link link
 
       - name: Wait for container to be ready

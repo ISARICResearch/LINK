@@ -27,8 +27,8 @@ jobs:
       - name: Bring New Arc Version Into Link
         run: npx tsx src/lib/actions/bring_new_arc_version_into_link.ts
         env:
-          ARC_GITHUB_TOKEN: ${{ secrets.ARC_GITHUB_TOKEN }}
-          TRANSLATIONS_GITHUB_TOKEN: ${{ secrets.TRANSLATIONS_GITHUB_TOKEN }}
+          ARC_SOURCES_READ_TOKEN: ${{ secrets.ARC_SOURCES_READ_TOKEN }}
+          ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 

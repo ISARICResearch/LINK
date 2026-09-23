@@ -76,8 +76,8 @@ jobs:
               docker run -d --restart unless-stopped --name link \
                 --log-driver json-file --log-opt max-size=10m --log-opt max-file=3 \
                 -p 3000:3000 \
-                -e ARC_GITHUB_TOKEN="${{ secrets.ARC_GITHUB_TOKEN }}" \
-                -e TRANSLATIONS_GITHUB_TOKEN="${{ secrets.TRANSLATIONS_GITHUB_TOKEN }}" \
+                -e ARC_SOURCES_READ_TOKEN="${{ secrets.ARC_SOURCES_READ_TOKEN }}" \
+                -e ARC_TRANSLATIONS_PR_TOKEN="${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}" \
                 "${ECR_REPO}:latest"
 
               sleep 3

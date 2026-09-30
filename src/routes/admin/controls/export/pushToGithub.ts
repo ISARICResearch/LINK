@@ -1,4 +1,4 @@
-import { env } from "$lib/utils/utils";
+import { env } from '$lib/utils/utils';
 
 export async function pushFolderToGitHub(
 	files: Record<string, string>, // path -> csv content
@@ -38,7 +38,14 @@ export async function pushFolderToGitHub(
 				...auth,
 				body: JSON.stringify({ content: base64Content, encoding: 'base64' })
 			});
-			if (!blobRes.ok) throw new Error(`Blob upload error at ${path}: ${blobRes.status}`);
+			if (!blobRes.ok) {
+				const body = await blobRes.text();
+				throw new Error(
+					`Blob upload error at ${path}: ${blobRes.status} ${body} ` +
+						`retry-after=${blobRes.headers.get('retry-after')} ` +
+						`remaining=${blobRes.headers.get('x-ratelimit-remaining')}`
+				);
+			}
 			const blob = await blobRes.json();
 
 			return {
@@ -87,7 +94,6 @@ export async function pushFolderToGitHub(
 		...auth,
 		body: JSON.stringify({ sha: newCommit.sha })
 	});
-
 
 	console.log('refRes', refRes);
 

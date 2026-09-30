@@ -54,31 +54,31 @@ jobs:
             --comment "Docker diagnostics" \
             --parameters 'commands=[
               "echo \"== whoami ==\"; whoami",
-              "echo \"== PATH ==\"; echo $PATH",
-              "echo \"== which docker ==\"; which docker || echo \"docker not in PATH\"",
-              "echo \"== command -v ==\"; command -v docker || true",
-              "echo \"== docker version ==\"; docker --version 2>&1 || true",
-              "echo \"== common locations ==\"; ls -l /usr/bin/docker /usr/local/bin/docker /snap/bin/docker 2>&1 || true",
-              "echo \"== service status ==\"; systemctl status docker --no-pager 2>&1 | head -20 || true",
-              "echo \"== package ==\"; (rpm -qa | grep -i docker) 2>/dev/null || (dpkg -l | grep -i docker) 2>/dev/null || echo \"no docker package found\"",
-              "echo \"== OS ==\"; cat /etc/os-release | head -3",
-              "echo \"== aws cli ==\"; which aws || echo \"aws cli not found\""
+              "echo \"== docker location ==\"; command -v docker || echo \"docker not found\"",
+              "echo \"== service ==\"; systemctl is-active docker 2>&1 || true",
+              "echo \"== package ==\"; rpm -qa 2>/dev/null | grep -i docker || echo \"no docker package\"",
+              "echo \"== OS ==\"; grep PRETTY_NAME /etc/os-release"
             ]' \
             --query "Command.CommandId" \
             --output text)
 
-          echo "Command ID: $CMD_ID"
-
-          # Wait for completion (don't fail the step if the command itself fails)
           aws ssm wait command-executed \
             --command-id "$CMD_ID" \
             --instance-id "$INSTANCE_ID" || true
 
+          echo "Status: $(aws ssm get-command-invocation \
+            --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" \
+            --query Status --output text)"
+
+          echo "----- STDOUT -----"
           aws ssm get-command-invocation \
-            --command-id "$CMD_ID" \
-            --instance-id "$INSTANCE_ID" \
-            --query "{Status:Status,Output:StandardOutputContent,Errors:StandardErrorContent}" \
-            --output json
+            --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" \
+            --query StandardOutputContent --output text
+
+          echo "----- STDERR -----"
+          aws ssm get-command-invocation \
+            --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" \
+            --query StandardErrorContent --output text
             
       - name: Deploy on EC2 via SSM Run Command
         env:

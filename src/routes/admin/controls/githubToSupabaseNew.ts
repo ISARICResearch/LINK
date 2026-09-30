@@ -469,28 +469,28 @@ export async function AddArcVersionToLink(version: string) {
 
 	// = (4) = find Arc-Translations for new segments and push them
 	const newTranslations = await HandleNewForwardTranslations(arcT, newSegments, translationData);
-	console.log('translationsToInsert', newTranslations);
+	console.log('translationsToInsert', newTranslations?.length);
 
 	// = (5, a) = check if existingSegments have progresses in link
-	console.log('5a existingSegments', existingSegments);
-	console.log('5a Link', [linkSegments, translationData]);
+	//console.log('5a existingSegments', existingSegments);
+	//console.log('5a Link', [linkSegments, translationData]);
 
 	// = (5, b) = for translations, create translation progress row
 	const newProgresses = await HandleNewProgresses(newTranslations);
-	console.log('newProgresses', newProgresses);
+	console.log('newProgresses', newProgresses?.length);
 
 	// = (6) = for translations, create first "Accepted Translation" row
 	const newAccepted = await HandleNewAcceptedTranslations(newTranslations);
-	console.log('newAccepted', newAccepted);
+	console.log('newAccepted', newAccepted?.length);
 
 	// = (7) = Create documents!
 	const allSegments: OriginalSegmentRow[] = [];
 	if (Object.values(existingSegments)) allSegments.push(...Object.values(existingSegments));
 	if (newSegments) allSegments.push(...newSegments);
 
-	console.log('allSegments', allSegments);
-	console.log('existingSegments', Object.keys(existingSegments));
-	console.log('newSegments', newSegments);
+	console.log('allSegments', allSegments.length);
+	console.log('existingSegments', Object.keys(existingSegments).length);
+	console.log('newSegments', newSegments?.length);
 	
 
 	// @ AIDAN LOOK HERE: we need to get all original ids that are in arcT['English'] to push into the documents.

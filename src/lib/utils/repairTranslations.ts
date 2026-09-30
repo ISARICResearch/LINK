@@ -66,7 +66,7 @@ export async function repairLink(version: string) {
 				} else {
 					const row = obj.translationProgress;
 					row.translation_step = calculatedStep;
-					console.log('progressUpsert', row);
+					//console.log('progressUpsert', row);
 					progressUpsert.push(row);
 				}
 			}
@@ -82,16 +82,16 @@ export async function repairLink(version: string) {
 				const badId = reClacAT.translation_id != at?.translation_id;
 				const badScore = reClacAT.score != at?.score;
 				if (!at || badId || badScore) acceptedUpsert.push(reClacAT);
-			} else
+			} /*else
 				console.log("reClac null, couldn't find best translation.", {
 					original: link[0][+id],
 					translation: obj
-				});
+				});*/
 		}
 	}
 
 	if (progressUpsert.length > 0) {
-		console.log('progressUpsert', progressUpsert);
+		//console.log('progressUpsert', progressUpsert);
 		const { error: progressError } = await supabase
 			.from('translation_progress')
 			.upsert(progressUpsert, { onConflict: 'id' });
@@ -99,7 +99,7 @@ export async function repairLink(version: string) {
 	}
 
 	if (acceptedUpsert.length > 0) {
-		console.log('acceptedUpsert', acceptedUpsert);
+		//console.log('acceptedUpsert', acceptedUpsert);
 		const inserts = acceptedUpsert.filter((r): r is AcceptedTranslationInsert => r.id === undefined);
 		const updates = acceptedUpsert.filter((r): r is AcceptedTranslationRow => r.id !== undefined);
 

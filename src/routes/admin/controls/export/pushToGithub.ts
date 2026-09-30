@@ -27,9 +27,12 @@ export async function pushFolderToGitHub(
 
 	console.log('branchData', branchData);
 
+	console.log(' -- Upload each file as a blob, collect SHAs --');
+
 	// ── STEP 2 ── Upload each file as a blob, collect SHAs
 	const treeItems = await Promise.all(
 		Object.entries(files).map(async ([path, content]) => {
+			console.log('start: ' + path + ' OKAY');
 			// Encode content to base64
 			const base64Content = btoa(unescape(encodeURIComponent(content)));
 
@@ -38,6 +41,7 @@ export async function pushFolderToGitHub(
 				...auth,
 				body: JSON.stringify({ content: base64Content, encoding: 'base64' })
 			});
+			if (blobRes.ok) console.log('blobRes: ' + path + ' OKAY');
 			if (!blobRes.ok) {
 				const body = await blobRes.text();
 				throw new Error(

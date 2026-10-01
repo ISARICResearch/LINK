@@ -23,11 +23,13 @@ import {
 	type LinkSegments,
 	type LinkTranslationsRecord
 } from '../../../lib/utils/pullLink';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Handle
 async function HandleArcOriginalSegments(
 	arc: ArcStructure,
-	segments: LinkSegments
+	segments: LinkSegments,
+	supabaseAdmin?: SupabaseClient
 ): Promise<[LinkSegments, OriginalSegmentRow[] | null]> {
 	const segmentsInLink: LinkSegments = {};
 	const segmentsToInsert: OriginalSegmentInsert[] = [];
@@ -91,9 +93,22 @@ async function HandleArcOriginalSegments(
 	*/
 
 	//console.log(' .. segmentsToInsert', segmentsToInsert);
+	const {
+		data: { session }
+	} = await supabase.auth.getSession();
+	const {
+		data: { user }
+	} = await supabase.auth.getUser();
+	console.log('session user:', session?.user?.id ?? 'none (anon)');
+	console.log('getUser:', user?.id, user?.email, user?.role);
+
+	const sb = supabaseAdmin ? supabaseAdmin : supabase;
+	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ENGAGED ===');
+
 	if (segmentsToInsert.length < 1) return [segmentsInLink, null];
-	const insert = await supabase.from('original_segments').insert(segmentsToInsert).select('*');
-	if (insert.error) console.error('Insert error:', insert.error);
+
+	const insert = await sb.from('original_segments').insert(segmentsToInsert).select('*');
+	if (insert.error) console.error('Insert error original_segments:', insert.error);
 
 	return [segmentsInLink, insert.data];
 }
@@ -446,7 +461,7 @@ async function HandleNewAcceptedTranslations(translations: ForwardTranslationRow
 	return insert.data;
 }
 
-export async function AddArcVersionToLink(version: string) {
+export async function AddArcVersionToLink(version: string, supabaseAdmin?: SupabaseClient) {
 	const startT = performance.now();
 	// = (1) = get all of Arc Translations for this version
 	const arcTranslations = await pullArcTranslations(version);
@@ -458,12 +473,11 @@ export async function AddArcVersionToLink(version: string) {
 	// = (3) = Get which segments already existed and new ones pushed
 	const [existingSegments, newSegments] = await HandleArcOriginalSegments(
 		arcT['English'],
-		linkSegments
+		linkSegments,
+		supabaseAdmin
 	);
 
-
 	//const segments = [...Object.values(existingSegments), ...newSegments];
-
 
 	//return;
 
@@ -491,7 +505,6 @@ export async function AddArcVersionToLink(version: string) {
 	console.log('allSegments', allSegments.length);
 	console.log('existingSegments', Object.keys(existingSegments).length);
 	console.log('newSegments', newSegments?.length);
-	
 
 	// @ AIDAN LOOK HERE: we need to get all original ids that are in arcT['English'] to push into the documents.
 	// go to CreateDocumentInserts... it will show you the way

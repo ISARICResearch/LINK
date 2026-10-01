@@ -34,5 +34,6 @@ jobs:
           ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          NEW_SEGMENTS_SUPABASE_KEY: ${{ secrets.NEW_SEGMENTS_SUPABASE_KEY }}
 
     

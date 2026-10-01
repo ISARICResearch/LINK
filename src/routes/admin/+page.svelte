@@ -9,10 +9,6 @@
 	import { pullLink, type LinkTranslation } from '$lib/utils/pullLink';
 	import type { Database } from '$lib/supabase/database.types';
 	import { supabase } from '../../supabaseClient';
-	import {
-		bring_new_arc_version_into_link,
-		export_link_results_to_arc
-	} from '$lib/actions/actions';
 	import { onMount } from 'svelte';
 
 	//import { update_link_from_arc } from '$lib/actions/update-link-from-arc';
@@ -20,14 +16,14 @@
 	//let linkVersions: Promise<Record<string, string[]>> = $state();
 	let selectedVersion = $derived(Object.keys(arcVersions)[0]);
 
-	const getLinkVersions = async() => {
+	const getLinkVersions = async () => {
 		return await supabase.from('documents').select('version').eq('title', 'ARC');
-	}
+	};
 
-	onMount(async()=>{
+	onMount(async () => {
 		const lVersions = await getLinkVersions();
 		console.log(lVersions);
-	})
+	});
 
 	const printStatus = async (version: string) => {
 		const link = await pullLink(version);
@@ -113,30 +109,6 @@
 			</select></label
 		>
 		<div class="border mt-2 rounded-lg border-stone-400 dark:border-stone-700">
-			<div class="sm:flex p-1.5 border-b border-inherit">
-				<button
-					title="Pull Lists from GitHub"
-					class=" w-1/3 mt-1 min-w-60 h-8 border-3 hover:shadow mr-2 font-semibold rounded-lg cursor-pointer
-						opacity-80 hover:opacity-100
-				  		border-blue-700 hover:bg-blue-700/20
-						dark:border-blue-600 dark:hover:bg-blue-600/20
-						"
-					onclick={async () => await bring_new_arc_version_into_link()}
-				>
-					bring_new_arc_version_into_link
-				</button>
-				<button
-					title="Pull Lists from GitHub"
-					class=" w-1/3 mt-1 min-w-60 h-8 border-3 hover:shadow mr-2 font-semibold rounded-lg cursor-pointer
-						opacity-80 hover:opacity-100
-				  		border-blue-700 hover:bg-blue-700/20
-						dark:border-blue-600 dark:hover:bg-blue-600/20
-						"
-					onclick={async () => await export_link_results_to_arc()}
-				>
-					export_link_results_to_arc
-				</button>
-			</div>
 			<div class="sm:flex p-1.5 border-b border-inherit">
 				<button
 					title="Pull Lists from GitHub"

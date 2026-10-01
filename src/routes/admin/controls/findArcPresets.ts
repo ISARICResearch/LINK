@@ -201,7 +201,7 @@ export async function GetArcPresets(
 
 	const listFolder = await fetchFolderNames(version);
 
-	console.log("listFolder", listFolder);
+	//console.log("listFolder", listFolder);
 
 	const arcMain = await fetchAndParseArcMain(version);
 	const arcPresetMap = await mapArcPresets(arcMain);

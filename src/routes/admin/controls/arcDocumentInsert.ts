@@ -17,8 +17,7 @@ async function PullAllDocumentData() {
 export async function HandleDocumentInsert(
 	version: string,
 	segments: OriginalSegmentRow[],
-	_arc: ArcStructure,
-	supabaseAdmin?: SupabaseClient
+	_arc: ArcStructure
 ) {
 	// = (1) = Pull existing documents
 	const existingDocuments = await PullAllDocumentData();
@@ -33,9 +32,6 @@ export async function HandleDocumentInsert(
 
 	const documentsToUpdate: DocumentInsert[] = [];
 	const documentsToInsert: DocumentInsert[] = [];
-
-	const sb = supabaseAdmin ? supabaseAdmin : supabase;
-	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ENGAGED, documents ===');
 
 	// = (3) = Handle if document exists, update it, otherwise insert it as new
 	for (const insert of documentsMaybeInsert) {
@@ -64,13 +60,13 @@ export async function HandleDocumentInsert(
 	// == Upsert all documents to upsert == //
 	if (documentsToUpdate.length > 0) {
 		console.log('documentsToUpdate', documentsToUpdate);
-		const update = await sb.from('documents').upsert(documentsToUpdate, { onConflict: 'id' });
+		const update = await supabase.from('documents').upsert(documentsToUpdate, { onConflict: 'id' });
 		//.select('*');
 		if (update.error) console.error('Update error:', update.error);
 	}
 	if (documentsToInsert.length > 0) {
 		console.log('documentsToInsert', documentsToInsert);
-		const insert = await sb.from('documents').insert(documentsToInsert);
+		const insert = await supabase.from('documents').insert(documentsToInsert);
 		//.select('*');
 		if (insert.error) console.error('Insert error:', insert.error);
 	}
@@ -170,7 +166,7 @@ async function CreateDocumentInserts(version: string, segments: OriginalSegmentR
 		}
 	}
 
-	console.log('documentMap', documentMap);
+	//console.log('documentMap', documentMap);
 
 	for (const [title, ids] of Object.entries(documentMap)) {
 		documentInserts.push({ title: title, version: version, original_ids: Array.from(ids) });
@@ -200,8 +196,8 @@ const GetSegmentsInArc = (
 			if (!v) return false;
 			if (variableNames.includes(v)) if (s) return true;
 			if (v.includes(' ')) return true;*/
-			// @ AIDAN COME BACK - this makes all labels always add, so long as they were in the document. But maybe we don't want that?
-			/*return false;
+// @ AIDAN COME BACK - this makes all labels always add, so long as they were in the document. But maybe we don't want that?
+/*return false;
 		});
 	};
 

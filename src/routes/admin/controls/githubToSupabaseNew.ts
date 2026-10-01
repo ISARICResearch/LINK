@@ -23,13 +23,12 @@ import {
 	type LinkSegments,
 	type LinkTranslationsRecord
 } from '../../../lib/utils/pullLink';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Handle
 async function HandleArcOriginalSegments(
 	arc: ArcStructure,
 	segments: LinkSegments,
-	supabaseAdmin?: SupabaseClient
+	
 ): Promise<[LinkSegments, OriginalSegmentRow[] | null]> {
 	const segmentsInLink: LinkSegments = {};
 	const segmentsToInsert: OriginalSegmentInsert[] = [];
@@ -102,12 +101,10 @@ async function HandleArcOriginalSegments(
 	console.log('session user:', session?.user?.id ?? 'none (anon)');
 	console.log('getUser:', user?.id, user?.email, user?.role);
 
-	const sb = supabaseAdmin ? supabaseAdmin : supabase;
-	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ENGAGED, original_segments ===');
 
 	if (segmentsToInsert.length < 1) return [segmentsInLink, null];
 
-	const insert = await sb.from('original_segments').insert(segmentsToInsert).select('*');
+	const insert = await supabase.from('original_segments').insert(segmentsToInsert).select('*');
 	if (insert.error) console.error('Insert error original_segments:', insert.error);
 
 	return [segmentsInLink, insert.data];
@@ -118,7 +115,7 @@ async function HandleNewForwardTranslations(
 	arc: ArcLanguageStructure,
 	newSegments: OriginalSegmentRow[] | null,
 	_translations: LinkTranslationsRecord,
-	supabaseAdmin?: SupabaseClient
+	
 ) {
 	if (!newSegments) return null;
 
@@ -410,13 +407,9 @@ async function HandleNewForwardTranslations(
 
 	console.log('segments failed to find a translation for', failedSegments.length);
 
-	const sb = supabaseAdmin ? supabaseAdmin : supabase;
-	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ENGAGED, forward_translations ===');
 
-	const insert = await sb
-		.from('forward_translations')
-		.insert(translationsToInsert)
-		.select('*');
+
+	const insert = await supabase.from('forward_translations').insert(translationsToInsert).select('*');
 
 	if (insert.error) console.error('Insert error:', insert.error);
 
@@ -424,7 +417,10 @@ async function HandleNewForwardTranslations(
 }
 
 // & push new translation progress for each original item
-async function HandleNewProgresses(translations: ForwardTranslationRow[] | null, supabaseAdmin?: SupabaseClient) {
+async function HandleNewProgresses(
+	translations: ForwardTranslationRow[] | null,
+	
+) {
 	if (!translations) return;
 
 	const progressesToInsert: TranslationProgressInsert[] = [];
@@ -436,10 +432,8 @@ async function HandleNewProgresses(translations: ForwardTranslationRow[] | null,
 		});
 	}
 
-	const sb = supabaseAdmin ? supabaseAdmin : supabase;
-	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ENGAGED, translation_progress ===');
 
-	const insert = await sb.from('translation_progress').insert(progressesToInsert).select('*');
+	const insert = await supabase.from('translation_progress').insert(progressesToInsert).select('*');
 
 	if (insert.error) console.error('Insert error:', insert.error);
 
@@ -447,7 +441,10 @@ async function HandleNewProgresses(translations: ForwardTranslationRow[] | null,
 }
 
 // & push new accepted translation for each translation pair
-async function HandleNewAcceptedTranslations(translations: ForwardTranslationRow[] | null, supabaseAdmin?: SupabaseClient) {
+async function HandleNewAcceptedTranslations(
+	translations: ForwardTranslationRow[] | null,
+	
+) {
 	if (!translations) return;
 
 	const acceptedToInsert: AcceptedTranslationInsert[] = [];
@@ -461,17 +458,15 @@ async function HandleNewAcceptedTranslations(translations: ForwardTranslationRow
 		});
 	}
 
-	const sb = supabaseAdmin ? supabaseAdmin : supabase;
-	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ENGAGED, accepted_translations ===');
 
-	const insert = await sb.from('accepted_translations').insert(acceptedToInsert).select('*');
+	const insert = await supabase.from('accepted_translations').insert(acceptedToInsert).select('*');
 
 	if (insert.error) console.error('Insert error:', insert.error);
 
 	return insert.data;
 }
 
-export async function AddArcVersionToLink(version: string, supabaseAdmin?: SupabaseClient) {
+export async function AddArcVersionToLink(version: string) {
 	const startT = performance.now();
 	// = (1) = get all of Arc Translations for this version
 	const arcTranslations = await pullArcTranslations(version);
@@ -480,11 +475,14 @@ export async function AddArcVersionToLink(version: string, supabaseAdmin?: Supab
 	// = (2) = get all of link data
 	const [linkSegments, translationData] = await pullLink(version);
 
+	console.log('linkSegments', Object.keys(linkSegments).length);
+	console.log('translationData', translationData.lenth);
+
+	return;
 	// = (3) = Get which segments already existed and new ones pushed
 	const [existingSegments, newSegments] = await HandleArcOriginalSegments(
 		arcT['English'],
-		linkSegments,
-		supabaseAdmin
+		linkSegments
 	);
 
 	//const segments = [...Object.values(existingSegments), ...newSegments];
@@ -492,7 +490,12 @@ export async function AddArcVersionToLink(version: string, supabaseAdmin?: Supab
 	//return;
 
 	// = (4) = find Arc-Translations for new segments and push them
-	const newTranslations = await HandleNewForwardTranslations(arcT, newSegments, translationData, supabaseAdmin);
+	const newTranslations = await HandleNewForwardTranslations(
+		arcT,
+		newSegments,
+		translationData,
+		
+	);
 	console.log('translationsToInsert', newTranslations?.length);
 
 	// = (5, a) = check if existingSegments have progresses in link
@@ -500,11 +503,11 @@ export async function AddArcVersionToLink(version: string, supabaseAdmin?: Supab
 	//console.log('5a Link', [linkSegments, translationData]);
 
 	// = (5, b) = for translations, create translation progress row
-	const newProgresses = await HandleNewProgresses(newTranslations, supabaseAdmin);
+	const newProgresses = await HandleNewProgresses(newTranslations, );
 	console.log('newProgresses', newProgresses?.length);
 
 	// = (6) = for translations, create first "Accepted Translation" row
-	const newAccepted = await HandleNewAcceptedTranslations(newTranslations, supabaseAdmin);
+	const newAccepted = await HandleNewAcceptedTranslations(newTranslations, );
 	console.log('newAccepted', newAccepted?.length);
 
 	// = (7) = Create documents!
@@ -521,7 +524,7 @@ export async function AddArcVersionToLink(version: string, supabaseAdmin?: Supab
 
 	// Wait, that is literally what I am trying to do above.
 
-	await HandleDocumentInsert(version, allSegments, arcT['English'], supabaseAdmin);
+	await HandleDocumentInsert(version, allSegments, arcT['English'], );
 
 	const endT = performance.now();
 	console.log('Done! in ' + String((endT - startT) / 1000) + 's');

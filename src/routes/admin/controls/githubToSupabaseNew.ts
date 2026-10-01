@@ -56,7 +56,7 @@ async function HandleArcOriginalSegments(
 	}
 
 	// = (2) = get if segments are already in LINK
-	console.log(" .. link's segments:", segments);
+	//console.log(" .. link's segments:", segments);
 	const segmentsArray = Object.values(segments);
 
 	// * add insert if it is not already in arc
@@ -90,7 +90,7 @@ async function HandleArcOriginalSegments(
 	if (insert.error) console.error('Insert error:', insert.error);
 	*/
 
-	console.log(' .. segmentsToInsert', segmentsToInsert);
+	//console.log(' .. segmentsToInsert', segmentsToInsert);
 	if (segmentsToInsert.length < 1) return [segmentsInLink, null];
 	const insert = await supabase.from('original_segments').insert(segmentsToInsert).select('*');
 	if (insert.error) console.error('Insert error:', insert.error);

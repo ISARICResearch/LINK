@@ -61,7 +61,7 @@ export async function pushFolderToGitHub(
 		})
 	);
 
-	console.log('treeItems', treeItems);
+	//console.log('treeItems', treeItems);
 
 	// ── STEP 3 ── Create a new tree on top of the existing one
 	// base_tree: existing tree SHA — files NOT in your list are preserved

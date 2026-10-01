@@ -478,7 +478,6 @@ export async function AddArcVersionToLink(version: string) {
 	console.log('linkSegments', Object.keys(linkSegments).length);
 	console.log('translationData', translationData.lenth);
 
-	return;
 	// = (3) = Get which segments already existed and new ones pushed
 	const [existingSegments, newSegments] = await HandleArcOriginalSegments(
 		arcT['English'],
@@ -518,11 +517,6 @@ export async function AddArcVersionToLink(version: string) {
 	console.log('allSegments', allSegments.length);
 	console.log('existingSegments', Object.keys(existingSegments).length);
 	console.log('newSegments', newSegments?.length);
-
-	// @ AIDAN LOOK HERE: we need to get all original ids that are in arcT['English'] to push into the documents.
-	// go to CreateDocumentInserts... it will show you the way
-
-	// Wait, that is literally what I am trying to do above.
 
 	await HandleDocumentInsert(version, allSegments, arcT['English'], );
 

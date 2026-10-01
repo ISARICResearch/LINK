@@ -28,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Bring New Arc Version Into Link
-        run: npx tsx src/lib/actions/bring_new_arc_version_into_link.ts
+        run: npx tsx src/lib/server/bring_new_arc_version_into_link.ts
         env:
           ARC_SOURCES_READ_TOKEN: ${{ secrets.ARC_SOURCES_READ_TOKEN }}
           ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}

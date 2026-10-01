@@ -28,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Export Link Results To Arc
-        run: npx tsx src/lib/actions/export_link_results_to_arc.ts
+        run: npx tsx src/lib/server/export_link_results_to_arc.ts
         env:
           ARC_SOURCES_READ_TOKEN: ${{ secrets.ARC_SOURCES_READ_TOKEN }}
           ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}

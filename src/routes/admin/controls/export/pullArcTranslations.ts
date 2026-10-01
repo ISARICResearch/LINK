@@ -93,9 +93,9 @@ async function parseCSVs(content: Record<string, string>) {
 		if (parsedCsv.errors.length > 0) {
 			console.warn(`Error parsing ${path}:`, parsedCsv.errors);
 			//throw new Error(`Error parsing ${path}: ${JSON.stringify(parsedCsv.errors)}`);}
-			continue
+			continue;
 		}
-			
+
 		// = map it to content
 		parsedContent[path] = parsedCsv.data;
 	}
@@ -108,7 +108,7 @@ export async function pullArcTranslations(version: string) {
 	// & get list of arch files to download from most recent branch of ARCH for our version
 	async function findFiles(
 		version: string,
-		auth: { headers: { Authorization: string } },
+		auth: { headers: { Authorization?: string } },
 		owner: string = 'ISARICResearch',
 		repo: string = 'ARC-Translations',
 		branch: string = 'main'
@@ -201,7 +201,7 @@ export async function pullArcTranslations(version: string) {
 	}
 
 	// + set github authentication and arch version we are looking for
-	const githubToken = env('ARC_SOURCES_READ_TOKEN');
+	const githubToken = env('VITE_ARC_SOURCES_READ_TOKEN');
 	const githubAuth = { headers: { Authorization: `Bearer ${githubToken}` } };
 
 	// = ( 1 ) = Get list of files to download

@@ -3,7 +3,7 @@ import { env } from '$lib/utils/utils';
 export async function pushFolderToGitHub(
 	files: Record<string, string>, // path -> csv content
 	commitMessage: string,
-	owner: string = 'aidanmarler', //'ISARICResearch',
+	owner: string = 'ISARICResearch', //'ISARICResearch',
 	repo: string = 'ARC-Translations', //'ARC-Translations',
 	branch: string = 'main'
 ) {

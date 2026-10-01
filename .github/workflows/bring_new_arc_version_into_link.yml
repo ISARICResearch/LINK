@@ -30,7 +30,7 @@ jobs:
       - name: Bring New Arc Version Into Link
         run: npx tsx src/lib/server/bring_new_arc_version_into_link.ts
         env:
-          ARC_SOURCES_READ_TOKEN: ${{ secrets.ARC_SOURCES_READ_TOKEN }}
+          VITE_ARC_SOURCES_READ_TOKEN: ${{ secrets.VITE_ARC_SOURCES_READ_TOKEN }}
           ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}

@@ -59,13 +59,13 @@ export async function HandleDocumentInsert(
 
 	// == Upsert all documents to upsert == //
 	if (documentsToUpdate.length > 0) {
-		console.log('documentsToUpdate', documentsToUpdate);
+		console.log('documentsToUpdate', documentsToUpdate.length);
 		const update = await supabase.from('documents').upsert(documentsToUpdate, { onConflict: 'id' });
 		//.select('*');
 		if (update.error) console.error('Update error:', update.error);
 	}
 	if (documentsToInsert.length > 0) {
-		console.log('documentsToInsert', documentsToInsert);
+		console.log('documentsToInsert', documentsToInsert.length);
 		const insert = await supabase.from('documents').insert(documentsToInsert);
 		//.select('*');
 		if (insert.error) console.error('Insert error:', insert.error);

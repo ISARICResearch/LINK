@@ -27,8 +27,7 @@ import {
 // Handle
 async function HandleArcOriginalSegments(
 	arc: ArcStructure,
-	segments: LinkSegments,
-	
+	segments: LinkSegments
 ): Promise<[LinkSegments, OriginalSegmentRow[] | null]> {
 	const segmentsInLink: LinkSegments = {};
 	const segmentsToInsert: OriginalSegmentInsert[] = [];
@@ -101,7 +100,6 @@ async function HandleArcOriginalSegments(
 	console.log('session user:', session?.user?.id ?? 'none (anon)');
 	console.log('getUser:', user?.id, user?.email, user?.role);
 
-
 	if (segmentsToInsert.length < 1) return [segmentsInLink, null];
 
 	const insert = await supabase.from('original_segments').insert(segmentsToInsert).select('*');
@@ -114,8 +112,7 @@ async function HandleArcOriginalSegments(
 async function HandleNewForwardTranslations(
 	arc: ArcLanguageStructure,
 	newSegments: OriginalSegmentRow[] | null,
-	_translations: LinkTranslationsRecord,
-	
+	_translations: LinkTranslationsRecord
 ) {
 	if (!newSegments) return null;
 
@@ -407,9 +404,10 @@ async function HandleNewForwardTranslations(
 
 	console.log('segments failed to find a translation for', failedSegments.length);
 
-
-
-	const insert = await supabase.from('forward_translations').insert(translationsToInsert).select('*');
+	const insert = await supabase
+		.from('forward_translations')
+		.insert(translationsToInsert)
+		.select('*');
 
 	if (insert.error) console.error('Insert error:', insert.error);
 
@@ -417,10 +415,7 @@ async function HandleNewForwardTranslations(
 }
 
 // & push new translation progress for each original item
-async function HandleNewProgresses(
-	translations: ForwardTranslationRow[] | null,
-	
-) {
+async function HandleNewProgresses(translations: ForwardTranslationRow[] | null) {
 	if (!translations) return;
 
 	const progressesToInsert: TranslationProgressInsert[] = [];
@@ -432,7 +427,6 @@ async function HandleNewProgresses(
 		});
 	}
 
-
 	const insert = await supabase.from('translation_progress').insert(progressesToInsert).select('*');
 
 	if (insert.error) console.error('Insert error:', insert.error);
@@ -441,10 +435,7 @@ async function HandleNewProgresses(
 }
 
 // & push new accepted translation for each translation pair
-async function HandleNewAcceptedTranslations(
-	translations: ForwardTranslationRow[] | null,
-	
-) {
+async function HandleNewAcceptedTranslations(translations: ForwardTranslationRow[] | null) {
 	if (!translations) return;
 
 	const acceptedToInsert: AcceptedTranslationInsert[] = [];
@@ -457,7 +448,6 @@ async function HandleNewAcceptedTranslations(
 			score: '0' // @ initial score
 		});
 	}
-
 
 	const insert = await supabase.from('accepted_translations').insert(acceptedToInsert).select('*');
 
@@ -478,6 +468,8 @@ export async function AddArcVersionToLink(version: string) {
 	console.log('linkSegments', Object.keys(linkSegments).length);
 	console.log('translationData', translationData.lenth);
 
+	if (!linkSegments) throw new Error('No LINK was pulled, ending job early.');
+
 	// = (3) = Get which segments already existed and new ones pushed
 	const [existingSegments, newSegments] = await HandleArcOriginalSegments(
 		arcT['English'],
@@ -489,12 +481,7 @@ export async function AddArcVersionToLink(version: string) {
 	//return;
 
 	// = (4) = find Arc-Translations for new segments and push them
-	const newTranslations = await HandleNewForwardTranslations(
-		arcT,
-		newSegments,
-		translationData,
-		
-	);
+	const newTranslations = await HandleNewForwardTranslations(arcT, newSegments, translationData);
 	console.log('translationsToInsert', newTranslations?.length);
 
 	// = (5, a) = check if existingSegments have progresses in link
@@ -502,11 +489,11 @@ export async function AddArcVersionToLink(version: string) {
 	//console.log('5a Link', [linkSegments, translationData]);
 
 	// = (5, b) = for translations, create translation progress row
-	const newProgresses = await HandleNewProgresses(newTranslations, );
+	const newProgresses = await HandleNewProgresses(newTranslations);
 	console.log('newProgresses', newProgresses?.length);
 
 	// = (6) = for translations, create first "Accepted Translation" row
-	const newAccepted = await HandleNewAcceptedTranslations(newTranslations, );
+	const newAccepted = await HandleNewAcceptedTranslations(newTranslations);
 	console.log('newAccepted', newAccepted?.length);
 
 	// = (7) = Create documents!
@@ -518,7 +505,7 @@ export async function AddArcVersionToLink(version: string) {
 	console.log('existingSegments', Object.keys(existingSegments).length);
 	console.log('newSegments', newSegments?.length);
 
-	await HandleDocumentInsert(version, allSegments, arcT['English'], );
+	await HandleDocumentInsert(version, allSegments, arcT['English']);
 
 	const endT = performance.now();
 	console.log('Done! in ' + String((endT - startT) / 1000) + 's');

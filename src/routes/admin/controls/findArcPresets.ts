@@ -76,7 +76,7 @@ export async function GetArcPresets(
 		const contents = await response.json();
 
 		// Filter for directories only and extract names
-		console.log('contents', contents, typeof contents);
+		//console.log('contents', contents, typeof contents);
 		// @ what is the real type?
 		const folderNames = contents
 			.filter((item: any) => item.type === 'dir')

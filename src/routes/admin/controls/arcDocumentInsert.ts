@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { supabase } from '../../../supabaseClient';
 import { GetArcPresets } from './findArcPresets';
 import type { ArcStructure } from './export/pullArcTranslations';
+import type { SupabaseClient } from '@supabase/supabase-js';
 //import { ListsEnglishToInsert } from './arcSegmentInsert';
 
 async function PullAllDocumentData() {
@@ -16,7 +17,8 @@ async function PullAllDocumentData() {
 export async function HandleDocumentInsert(
 	version: string,
 	segments: OriginalSegmentRow[],
-	_arc: ArcStructure
+	_arc: ArcStructure,
+	supabaseAdmin?: SupabaseClient
 ) {
 	// = (1) = Pull existing documents
 	const existingDocuments = await PullAllDocumentData();
@@ -31,6 +33,9 @@ export async function HandleDocumentInsert(
 
 	const documentsToUpdate: DocumentInsert[] = [];
 	const documentsToInsert: DocumentInsert[] = [];
+
+	const sb = supabaseAdmin ? supabaseAdmin : supabase;
+	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ENGAGED, documents ===');
 
 	// = (3) = Handle if document exists, update it, otherwise insert it as new
 	for (const insert of documentsMaybeInsert) {
@@ -59,13 +64,13 @@ export async function HandleDocumentInsert(
 	// == Upsert all documents to upsert == //
 	if (documentsToUpdate.length > 0) {
 		console.log('documentsToUpdate', documentsToUpdate);
-		const update = await supabase.from('documents').upsert(documentsToUpdate, { onConflict: 'id' });
+		const update = await sb.from('documents').upsert(documentsToUpdate, { onConflict: 'id' });
 		//.select('*');
 		if (update.error) console.error('Update error:', update.error);
 	}
 	if (documentsToInsert.length > 0) {
 		console.log('documentsToInsert', documentsToInsert);
-		const insert = await supabase.from('documents').insert(documentsToInsert);
+		const insert = await sb.from('documents').insert(documentsToInsert);
 		//.select('*');
 		if (insert.error) console.error('Insert error:', insert.error);
 	}
@@ -77,8 +82,8 @@ async function CreateDocumentInserts(version: string, segments: OriginalSegmentR
 
 	// = (1) = Get arc presets to assign to documents
 	const [arcPresetMap, listsPresetMap] = await GetArcPresets(version);
-	console.log('arcPresetMap', arcPresetMap);
-	console.log('listsPresetMap', listsPresetMap);
+	//console.log('arcPresetMap', Object.keys(arcPresetMap));
+	//console.log('listsPresetMap', Object.keys(listsPresetMap));
 
 	/*
 	get arc -> arch -> variable names as Set()

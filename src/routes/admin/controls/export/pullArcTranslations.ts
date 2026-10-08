@@ -6,6 +6,25 @@ import Papa from 'papaparse';
 export type CsvData = Record<string, unknown[]>;
 //export type ArcVariableTranslationReview =
 
+export type ArcRow = {
+	Variable: string;
+	Form: string;
+	Section: string;
+	Question: string;
+	'Answer Options': string;
+	Definition: string;
+	'Completion Guideline': string;
+	Score: number;
+	'Question Translation Reviewers'?: string;
+	'Definition Translation Reviewers'?: string;
+	'Completion Guideline Translation Reviewers'?: string;
+	'Form Translation Reviewers'?: string;
+	'Section Translation Reviewers'?: string;
+	'Answer Options Translation Reviewers'?: string;
+};
+
+export type ListRow = Record<string, string>[];
+
 export type ArcStructure = {
 	Lists?: Record<string, Record<string, Record<string, string>[]>>;
 	'ARCH.csv'?: Record<
@@ -18,6 +37,7 @@ export type ArcStructure = {
 			'Answer Options': string;
 			Definition: string;
 			'Completion Guideline': string;
+			Score: number;
 			'Question Translation Reviewers'?: string;
 			'Definition Translation Reviewers'?: string;
 			'Completion Guideline Translation Reviewers'?: string;

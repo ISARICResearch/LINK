@@ -21,7 +21,7 @@
 			</p>
 			<p class="font-normal text-lg italic text-center">
 				Help translate ISARIC's ARC database of CRF questions so that our Bridge is more accessible
-				to researchers and clinitians around the world
+				to researchers and clinicians around the world
 			</p>
 		</div>
 	</div>

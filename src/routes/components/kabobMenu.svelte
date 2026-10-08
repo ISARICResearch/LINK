@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { supabase } from '../../supabaseClient';
-	import { goto } from '$app/navigation';
 
 	let menuContainer: HTMLDivElement;
 	let menuOpen = $state(false);
@@ -40,7 +39,7 @@
 		onclick={() => {
 			menuOpen = !menuOpen;
 		}}
-		class="opacity-70 hover:opacity-100 h-full translate-x-2 translate-y-1 cursor-pointer"
+		class="opacity-70 hover:opacity-100 active:opacity-50 h-full translate-x-2 translate-y-1 cursor-pointer"
 		title="Menu"><img alt="Menu" class="dark:invert h-8" src="/interaction/kabob.svg" /></button
 	>
 	{#if menuOpen}
@@ -72,8 +71,6 @@
 					title="Logout"
 					onclick={() => {
 						supabase.auth.signOut();
-						// load href="/login"
-						goto('/login');
 					}}
 				>
 					<img class="dark:invert w-9 p-1" alt="Menu" src="/interaction/logout.svg" />

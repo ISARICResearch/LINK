@@ -458,6 +458,7 @@ async function HandleNewAcceptedTranslations(translations: ForwardTranslationRow
 
 export async function AddArcVersionToLink(version: string) {
 	const startT = performance.now();
+	console.log('AddArcVersionToLink:', version);
 	// = (1) = get all of Arc Translations for this version
 	const arcTranslations = await pullArcTranslations(version);
 	const arcT = arcTranslations['ARCH' + version];

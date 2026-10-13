@@ -1,14 +1,20 @@
 import type { PageLoad } from './$types';
 import type { LocationNode } from '$lib/utils/locationTree';
 import { error } from '@sveltejs/kit';
+import { getRelatedReviews, getRelatedTranslations } from './components/review/reviewForm';
+import type { TranslationLanguage } from '$lib/types';
 
 export const ssr = false; // Force client-side for authentication
 
 export const load: PageLoad = async ({ params, parent }) => {
+	console.time('parent-wait');
 	const parentData = await parent();
 
 	// Wait for the data promise to resolve
-	const { locationTree } = await parentData.dataPromise;
+	const { locationTree, segmentMap } = await parentData.dataPromise;
+	console.timeEnd('parent-wait');
+
+	console.time('fetch-kickoff');
 
 	if (!locationTree) throw error(500, 'Location data not available');
 
@@ -39,10 +45,30 @@ export const load: PageLoad = async ({ params, parent }) => {
 		});
 	}
 
+	const toReview = Object.entries(segmentMap)
+		.filter(
+			([_i, v]) => v.translationProgress && v.translationProgress.translation_step == 'review'
+		)
+		.map(([k]) => Number(k));
+
+	// pull related translations
+	const relatedTranslations = getRelatedTranslations(
+		toReview,
+		parentData.profile.language as TranslationLanguage
+	);
+
+	const relatedReviews = getRelatedReviews(
+		toReview,
+		parentData.profile.language as TranslationLanguage
+	);
+
+	console.timeEnd('fetch-kickoff');
 	return {
 		currentNode,
 		breadcrumbs,
 		pathSegments,
-		notFound: false
+		notFound: false,
+		relatedTranslations,
+		relatedReviews
 	};
 };

@@ -18,7 +18,7 @@
 	}: {
 		segmentMap: SegmentMap;
 		profile: Profile;
-		onsubmit: (shouldContinue: boolean) => Promise<void>;
+		onsubmit: (shouldContinue: boolean, forward: boolean) => Promise<void>;
 	} = $props();
 
 	let saving: boolean = $state(false);
@@ -114,7 +114,7 @@
 			await invalidate('app:data');
 		}
 
-		if (shouldContinue) await onsubmit(shouldContinue);
+		if (shouldContinue) await onsubmit(shouldContinue, true);
 
 		loading.active = false;
 		return;

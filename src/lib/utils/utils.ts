@@ -46,9 +46,15 @@ export function sortSegmentMap(original: SegmentMap): [number, SegmentData][] {
 }
 
 // env key helper
-export const env = (key: string) =>
-  import.meta.env?.[key] ??
-  (typeof process !== 'undefined' ? process.env?.[key] : undefined);
+export const env2 = (key: string) =>
+	import.meta.env?.[key] ?? (typeof process !== 'undefined' ? process.env?.[key] : undefined);
+
+export const env = (key: string): string => {
+	const res =
+		import.meta.env?.[key] ?? (typeof process !== 'undefined' ? process.env?.[key] : undefined);
+	if (res == undefined) console.warn('Undefined Key: ' + key);
+	return res == undefined ? 'undefined' : res;
+};
 
 // For making a document label from a selected preset
 export const generateDocumentName = (selected_preset: string) => {

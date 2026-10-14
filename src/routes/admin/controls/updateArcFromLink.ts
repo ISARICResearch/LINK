@@ -59,8 +59,8 @@ export const formatArc = async (arc: ArcVersionStructure) => {
 			for (const list of Object.keys(lists)) {
 				for (const sublist of Object.keys(arc[v][l]['Lists'][list])) {
 					for (const r of Object.keys(arc[v][l]['Lists'][list][sublist])) {
-						if (arc[v][l]['Lists'][list][sublist][+r]['Translation Reviewers'] == undefined)
-							arc[v][l]['Lists'][list][sublist][+r]['Translation Reviewers'] = '0';
+						if (arc[v][l]['Lists'][list][sublist][+r]['Score'] == undefined)
+							arc[v][l]['Lists'][list][sublist][+r]['Score'] = '0';
 					}
 				}
 			}

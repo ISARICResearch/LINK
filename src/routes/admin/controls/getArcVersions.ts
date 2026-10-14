@@ -1,7 +1,8 @@
-import { env } from "$lib/utils/utils";
+import { env } from '$lib/utils/utils';
 
 export async function getArcVersions(): Promise<Record<string, string[]>> {
 	const githubToken = env('VITE_ARC_SOURCES_READ_TOKEN');
+
 	const response = await fetch(
 		`https://api.github.com/repos/ISARICResearch/ARC-Translations/contents`,
 		{
@@ -13,6 +14,8 @@ export async function getArcVersions(): Promise<Record<string, string[]>> {
 	);
 
 	// ! Return error
+	//console.log(response)
+	if (!response.ok) console.error (response)
 	if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
 
 	const topLevel = await response.json();

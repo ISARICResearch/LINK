@@ -22,7 +22,7 @@
 
 	onMount(async () => {
 		const lVersions = await getLinkVersions();
-		console.log(lVersions);
+		console.log("linkVersions", lVersions);
 	});
 
 	const printStatus = async (version: string) => {

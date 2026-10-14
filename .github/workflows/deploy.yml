@@ -42,6 +42,7 @@ jobs:
             --platform linux/arm64 \
             --build-arg VITE_SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}" \
             --build-arg VITE_SUPABASE_ANON_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
+            --build-arg VITE_ARC_SOURCES_READ_TOKEN="${{ secrets.VITE_ARC_SOURCES_READ_TOKEN }}" \
             -t ${{ secrets.ECR_REPOSITORY }}:latest \
             --push \
             .

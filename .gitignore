@@ -3,6 +3,7 @@ node_modules
 
 # Output
 .output
+.hidden
 .vercel
 .netlify
 .wrangler

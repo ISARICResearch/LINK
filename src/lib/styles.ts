@@ -1,4 +1,4 @@
-export const shadow = { color: 'shadow-stone-500/50 dark:shadow-black/60', soft: 'shadow-stone-500/25 dark:shadow-black/30' };
+export const shadow = { color: 'shadow-stone-500/50 dark:shadow-black/85', soft: 'shadow-stone-500/25 dark:shadow-black/30' };
 
 const cardLight: string = ' bg-stone-200 border-stone-600 ';
 const cardDark: string = ' dark:bg-stone-950 dark:border-stone-600 font-medium ';
@@ -28,7 +28,7 @@ export const form_element: string =
 	' font-medium rounded-lg bg-stone-100 hover:bg-stone-50 dark:bg-stone-800 dark:hover:bg-stone-700 px-2 py-0.5 rounded ';
 
 export const button_A_active: string =
-	'  cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-900 hover:shadow-xs hover:text-black dark:hover:text-white rounded-sm hover:border-stone-500 hover:underline ';
+	shadow.soft + '  cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-700/50 hover:shadow-xs hover:text-black dark:hover:text-white rounded-sm hover:border-stone-500 hover:underline ';
 export const button_A_inactive: string =
 	' opacity-80 font-medium rounded-sm bg-stone-300 dark:bg-stone-700 ';
 
@@ -72,14 +72,14 @@ export const button = {
 	stanley:
 		style.border_interactive +
 		' border cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-900 hover:shadow-xs hover:text-black dark:hover:text-white hover:underline ',
-	stone: 'border-stone-900 bg-stone-500/35 dark:border-stone-800 dark:bg-stone-900/50 ',
+	stone: 'border-stone-900 bg-stone-500/35 dark:border-stone-500/50 dark:bg-stone-500/25 ',
 	stoneHover:
-		' dark:hover:bg-stone-900 dark:hover:border-stone-600 hover:bg-stone-400/35 hover:border-stone-800 hover:shadow active:shadow-none active:bg-stone-400/15 ' +
+		' dark:hover:bg-stone-500/50 dark:hover:border-stone-500 hover:bg-stone-400/35 hover:border-stone-800 hover:shadow active:shadow-none active:bg-stone-400/15 dark:active:bg-stone-500/30 ' +
 		shadow.color,
 	soft: {
-		default: 'border-2 border-stone-400/50 dark:border-stone-800 ',
+		default: 'border-2 border-stone-400/50 dark:border-stone-700/50 ',
 		hover:
-			'  hover:bg-stone-100/50 hover:border-stone-400 dark:hover:bg-stone-900 dark:hover:border-stone-600 hover:shadow active:shadow-none active:bg-stone-400/15 ' +
+			'  hover:bg-stone-100/50 hover:border-stone-400 dark:hover:bg-stone-700/30 dark:hover:border-stone-700 hover:shadow active:shadow-none active:bg-stone-400/15 dark:active:bg-stone-950/15 dark:active:opacity-70 ' +
 			shadow.color
 	}
 
@@ -90,8 +90,8 @@ export const button = {
 export const card = {
 	translate: {
 		complete:
-			' shadow-sm shadow-stone-700/0 border font-medium border-stone-600  dark:border-stone-700 dark:bg-stone-950 ',
+			' border font-medium border-stone-600  dark:border-stone-700/50 dark:bg-stone-900 ',
 		incomplete:
-			' shadow-sm shadow-stone-700/20 border font-medium dark:border-stone-700 dark:bg-stone-950 '
+			' shadow-sm  border font-medium dark:border-stone-700/70 dark:bg-stone-900 ' + shadow.soft
 	}
 };

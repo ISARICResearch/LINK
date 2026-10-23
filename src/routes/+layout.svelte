@@ -37,7 +37,7 @@
 </script>
 
 <span
-	class="font-normal border-stone-600 dark:border-stone-600 bg-stone-200 dark:bg-stone-950 text-stone-950 dark:text-stone-100"
+	class="font-normal border-stone-600 dark:border-stone-400 bg-stone-200 dark:bg-stone-900 text-stone-950 dark:text-stone-50"
 >
 	<div class="w-full fixed z-20">
 		{#if loading.active}

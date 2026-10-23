@@ -110,17 +110,17 @@
 )}
 	<button
 		title={toolTip}
-		class=" px-1.5 flex justify-between rounded-md items-center w-full active:bg-stone-100 dark:active:bg-stone-black
+		class=" px-1.5 flex justify-between rounded-md items-center w-full active:bg-stone-100 dark:active:opacity-70
 						{selected
-			? ' opacity-70 bg-stone-400/50 '
-			: '  cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-950 '}"
+			? ' opacity-70 bg-stone-400/50 dark:bg-stone-700/70 '
+			: '  cursor-pointer hover:bg-stone-200 dark:hover:bg-stone-700 '}"
 		onclick={() => handlePresetChange(preset)}
 	>
 		<span class="font-semibold">
 			{title}
 		</span>
 
-		<span class="text-sm italic text-stone-700 dark:text-stone-500"> {visualLabel} </span>
+		<span class="text-sm italic text-stone-700 dark:text-stone-300/90"> {visualLabel} </span>
 	</button>
 {/snippet}
 
@@ -129,15 +129,15 @@
 		onclick={() => {
 			menuOpen = !menuOpen;
 		}}
-		class=" cursor-pointer border-inherit w-full px-5 hover:underline rounded-full {button.stone} {button.stoneHover} text-center"
+		class=" cursor-pointer border-inherit w-full px-5 hover:underline rounded-full text-center {button.stone} {button.stoneHover}"
 		title="Change current document"
-		><span class="text-stone-800 dark:text-stone-400">Document:</span>
+		><span class="text-stone-800 dark:text-stone-300">Document:</span>
 		<span class="font-semibold">{presetName} ▾</span></button
 	>
 	{#if menuOpen}
 		<div
 			transition:fly={{ y: 10, duration: 150 }}
-			class=" bg-stone-300 dark:bg-stone-900 border-2 border-stone-700 left-1/2 mr-1 -translate-1/2 mt-8 flex flex-col absolute shadow-lg p-1 w-90 max-w-90 translate-y-1/2 z-30 rounded-lg font-normal {shadow.color}"
+			class=" bg-stone-300 dark:bg-stone-900 border-2 border-stone-700 dark:border-stone-700/70 left-1/2 mr-1 -translate-1/2 mt-8 flex flex-col absolute shadow-lg p-1 w-90 max-w-90 translate-y-1/2 z-30 rounded-lg font-normal {shadow.color}"
 		>
 			<!-- Main documents (ARC)-->
 			<div class="items-center justify-center w-full flex">
@@ -173,11 +173,10 @@
 			{/each}
 
 			<p
-				title="ARC is in version {archVersion}"
-				class="w-full flex font-semibold  items-center justify-center italic cursor-context-menu text-center text-sm text-stone-700 dark:text-stone-500"
+				class="w-full flex font-semibold items-center justify-center italic text-center text-sm text-stone-700 dark:text-stone-300"
 			>
 				<span class="h-4 w-4 mr-0.5">
-					<Info />
+					<Info i="ARC is in version {archVersion}" />
 				</span>
 
 				<span>

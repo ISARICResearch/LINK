@@ -3,7 +3,7 @@
 	let profile = $derived(data.profile);
 
 	import { capitalizeFirstLetter } from '$lib/utils/utils';
-	import {  fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
 	const formattedLang = $derived(capitalizeFirstLetter(profile.language ? profile.language : ''));
 </script>
@@ -18,7 +18,7 @@
 			Getting Started
 		</h3>
 	</div>
-	<div class=" text-xl border-b-2 border-dashed border-inherit pb-4 px-4">
+	<div class=" text-xl border-b-2 border-dashed dark:border-stone-700 border-inherit pb-4 px-4">
 		<ol class="p-2">
 			<li class="mb-1">
 				<span class="font-bold">Choose a CRF to translate</span> by clicking "CRF to Translate" and then
@@ -36,7 +36,7 @@
 		</h3>
 	</div>
 
-	<div class=" text-xl border-dashed border-inherit pb-2 px-4">
+	<div class=" text-xl border-dashed border-inherit dark:border-stone-700 pb-2 px-4">
 		<!--	<p class="">Each segment (a word or pharse) will be translated using two steps:</p>-->
 
 		<ol class="p-2">
@@ -57,11 +57,11 @@
 			The translation with most votes will be added to ARC and used around the world!
 		</p>
 	</div>
-	<div class="border-b-2 border-dashed border-inherit p-4">
+	<div class="border-b-2 border-dashed dark:border-stone-700 border-inherit p-4">
 		<p class="italic text-center font-medium font-serif">More actions...</p>
 
 		<p class="px-2 py-1">
-			<span class="font-bold bg-stone-300 rounded-lg px-2 p-0.5"
+			<span class="font-bold bg-stone-300 dark:bg-stone-700/50 rounded-lg px-2 p-0.5"
 				>Skip<svg
 					class="w-5 h-5 inline mb-0.5 ml-0.5"
 					xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@
 			for when you do not know how to best translate something.
 		</p>
 		<p class="px-2 pb-2">
-			<span class="font-bold bg-stone-300 rounded-lg px-2 p-0.5"
+			<span class="font-bold bg-stone-300 dark:bg-stone-700/50 rounded-lg px-2 p-0.5"
 				>Leave a comment<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="24"
@@ -111,7 +111,7 @@
 			target="_blank"
 			href="https://youtu.be/F82CJoxbI2g"
 			title="Video Tutorial"
-			class=" bg-stone-100 font-medium p-0.5 px-2 rounded-lg shadow-xs hover:bg-stone-50 hover:shadow-md cursor-pointer hover:underline"
+			class=" bg-stone-100 dark:bg-stone-500/50 font-medium p-0.5 px-2 rounded-lg shadow-xs hover:bg-stone-50 dark:hover:bg-stone-500 hover:shadow-md cursor-pointer hover:underline"
 		>
 			📺 Video Tutorial</a
 		> A video explaining how to use LINK.
@@ -121,7 +121,7 @@
 			href="https://github.com/aidanmarler/LINK/wiki/LINK-User-Guide"
 			target="_blank"
 			title="User Guide"
-			class=" bg-stone-100 font-medium p-0.5 px-2 rounded-lg shadow-xs hover:bg-stone-50 hover:shadow-md cursor-pointer hover:underline"
+			class=" bg-stone-100 dark:bg-stone-500/50 font-medium p-0.5 px-2 rounded-lg shadow-xs hover:bg-stone-50 dark:hover:bg-stone-500 hover:shadow-md cursor-pointer hover:underline"
 		>
 			📘 User Guide
 		</a>
@@ -133,7 +133,7 @@
 			target="_blank"
 			href="https://ucdenver.co1.qualtrics.com/jfe/form/SV_8Bcvg9YcrkRHkt8"
 			title="Issue Report Form"
-			class=" bg-stone-100 font-medium p-0.5 px-2 rounded-lg shadow-xs hover:bg-stone-50 hover:shadow-md cursor-pointer hover:underline"
+			class=" bg-stone-100 dark:bg-stone-500/50 font-medium p-0.5 px-2 rounded-lg shadow-xs hover:bg-stone-50 dark:hover:bg-stone-500 hover:shadow-md cursor-pointer hover:underline"
 		>
 			⚠️ Issue Report Form</a
 		> Please report any bugs or issues encountered here.

@@ -56,11 +56,18 @@
 		return totalConfidence;
 	};
 
+	const color = {
+		yellow:
+			'border-yellow-600/70 hover:border-yellow-600/90 active:border-yellow-600 shadow-yellow-600/50 dark:border-yellow-500/70 dark:hover:border-yellow-500/90 dark:active:border-yellow-500 dark:shadow-yellow-500/50',
+		green:
+			'border-green-700/70 hover:border-green-700/90 active:border-green-700 shadow-green-700/50 dark:border-green-600/70 dark:hover:border-green-600/90 dark:active:border-green-600 dark:shadow-green-600/50'
+	};
+
 	const borderColor = (c: Confidence) =>
 		c == 0
-			? ' border-yellow-600/70 hover:border-yellow-600/90 active:border-yellow-600 shadow-yellow-600/50 '
+			? color.yellow
 			: c == 1
-				? ' border-green-700/70 hover:border-green-700/90 active:border-green-700 shadow-green-700/50 '
+				? color.green
 				: 'border-sky-600/70 hover:border-sky-600/90 active:border-sky-600 shadow-sky-600/50';
 </script>
 
@@ -71,7 +78,7 @@
 <div
 	class="{open
 		? 'border-t-2 max-h-50 suggestion-open '
-		: 'max-h-0 suggestion-close '} overflow-scroll rounded-b-md
+		: 'max-h-0 suggestion-close '} dark:border-stone-700/70 overflow-scroll rounded-b-md
 		"
 >
 	{#if open}
@@ -84,7 +91,9 @@
 				{:else}
 					{@const suggestion = Object.values(suggestionResult)}
 					<div class=" bg-conic-60 from-sky-500 to-green-600">
-						<div class="flex w-full bg-stone-200/95 backdrop-blur-3xl p-1 px-1.5 flex-col">
+						<div
+							class="flex w-full bg-stone-200/95 dark:bg-stone-900/95 backdrop-blur-3xl p-1 px-1.5 flex-col"
+						>
 							{#each suggestion as s}
 								{@const label = stepLabel(s.accepted_translation_step)}
 								{@const score = Math.round(s.score * 100)}
@@ -95,15 +104,15 @@
 										onclick={() => onSuggest(s.forward_translation_text)}
 										class=" {borderColor(
 											conf
-										)} bg-stone-100 w-full px-1 p-0.5 border-2 flex-col active:bg-white shadow-none flex font-normal hover:bg-stone-100 cursor-pointer opacity-80 hover:opacity-100 rounded-lg hover:shadow"
+										)} bg-stone-100 dark:bg-stone-900 w-full px-1 p-0.5 border-2 flex-col active:bg-white dark:active:bg-stone-700 dark:active:bg shadow-none flex font-normal cursor-pointer opacity-80 hover:opacity-100 rounded-lg hover:shadow"
 									>
 										<div
-											class="flex italic border-b border-stone-400/50 text-stone-700/90 font-semibold flex-row text-sm"
+											class="flex italic border-b border-stone-400/50 text-stone-700/90 dark:text-stone-200 font-semibold flex-row text-sm"
 										>
 											{@render symbol()}
 											<p
 												title="{score}% match with original text"
-												class="pl-1 pr-2 rounded-sm hover:bg-stone-200 cursor-context-menu"
+												class="pl-1 pr-2 rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 cursor-context-menu"
 											>
 												<b class={matchColor(score)}>{score}%</b> match
 											</p>
@@ -113,7 +122,7 @@
 												title={label == 'Accepted'
 													? 'Translation was accepted as correct.'
 													: 'Translation has not yet been accepted as correct.'}
-												class="px-2 rounded-sm hover:bg-stone-200 cursor-context-menu flex items-center {stepColor(
+												class="px-2 rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 cursor-context-menu flex items-center {stepColor(
 													label
 												)}"
 											>
@@ -141,13 +150,15 @@
 												{label}
 											</p>
 										</div>
-										<p class=" text-sm text-left text-stone-700 italic ">
-											<span title="English segment" class=" rounded-sm hover:bg-stone-200 px-1 cursor-context-menu">
-											{s.segment_text}
+										<p class=" text-sm text-left text-stone-700 dark:text-stone-100 italic">
+											<span
+												title="English segment"
+												class=" rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 px-1 cursor-context-menu"
+											>
+												{s.segment_text}
 											</span>
-											
 										</p>
-										<p class="text-black text-[17px] text-left px-1">
+										<p class="text-black dark:text-white text-[17px] text-left px-1">
 											{s.forward_translation_text}
 										</p>
 									</button>

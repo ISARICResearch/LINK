@@ -23,7 +23,7 @@
 	const language = $derived(capitalizeFirstLetter(profile.language ?? ""));
 </script>
 
-<div class="w-full text-stone-800 dark:text-stone-300">
+<div class="w-full text-stone-800 dark:text-stone-100">
 	<div class=" p-0 m-auto text-lg font-normal">
 		<h1 class="italic text-3xl p-0 font-medium w-full mb-4 text-center">
 			<span class=""

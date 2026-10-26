@@ -20,15 +20,34 @@
 
 	const basicStyle =
 		' h-5 flex items-center rounded-full ml-1 pl-1 pr-2 text-sm font-bold opacity-70 cursor-default ';
+
+	const color = {
+		yellow:
+			'border-yellow-700 bg-yellow-700/20 text-yellow-700 dark:text-yellow-500 dark:bg-yellow-500/15',
+		green:
+			'border-green-800 bg-green-800/10 text-green-800 dark:border-green-500 dark:bg-green-500/15 dark:text-green-500',
+		blue: ' border-sky-800 bg-sky-800/10 text-sky-800  dark:border-sky-400 dark:bg-sky-400/15 dark:text-sky-400',
+		grey: 'border-stone-800 bg-stone-800/10 text-stone-800 dark:text-stone-300 dark:bg-stone-300/15'
+	};
+
+	const stroke = {
+		yellow: 'stroke-yellow-700 dark:stroke-yellow-400',
+		grey: 'stroke-stone-800 dark:stroke-stone-300 '
+	};
+	const fill = {
+		none: 'fill-yellow-700/0',
+		yellow: 'fill-yellow-700 dark:fill-yellow-400',
+		grey: ' fill-stone-800 dark:fill-stone-300'
+	};
 </script>
 
 <!--Completion Indicator-->
 
 {#if saving}
-	<div title="saving" class=" {basicStyle} border-yellow-700 bg-yellow-700/10 text-yellow-700">
+	<div title="saving" class=" {color.yellow} {basicStyle} ">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			class="w-5 h-full p-0.5 stroke-yellow-700 fill-yellow-700"
+			class="w-5 h-full p-0.5 {stroke.yellow} {fill.yellow} "
 			width="24"
 			height="24"
 			viewBox="0 0 24 24"
@@ -48,9 +67,9 @@
 		saving...
 	</div>
 {:else if editing}
-	<div title="Will save" class="{basicStyle} border-yellow-800 bg-yellow-800/10 text-yellow-700">
+	<div title="Will save" class="{basicStyle}  {color.yellow}">
 		<svg
-			class="w-5 h-full px-0.5 stroke-yellow-800 fill-yellow-700/0"
+			class="w-5 h-full px-0.5 {stroke.yellow} {fill.none}"
 			xmlns="http://www.w3.org/2000/svg"
 			width="1024"
 			height="1024"
@@ -65,9 +84,9 @@
 		editing
 	</div>
 {:else if skipped && completed}
-	<div title="Skipped" class=" {basicStyle} border-stone-800 bg-stone-800/10 text-stone-800">
+	<div title="Skipped" class=" {basicStyle} {color.grey}">
 		<svg
-			class="w-5 px-0.5 h-full stroke-stone-800 fill-stone-800 dark:stroke-stone-500 dark:fill-stone-500"
+			class="w-5 px-0.5 h-full {stroke.grey} {fill.grey}"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -80,11 +99,10 @@
 		</svg>
 		<span>skipped</span>
 	</div>
-
 {:else if completed && completedText == 'reviewed'}
-	<div title="Complete" class="{basicStyle} border-sky-800 bg-sky-800/10 text-sky-800">
+	<div title="Complete" class="{basicStyle} {color.blue}">
 		<svg
-			class="w-5 h-full px-0.5 stroke-sky-800 fill-sky-800"
+			class="w-5 h-full px-0.5 stroke-sky-800 fill-sky-800 dark:stroke-sky-400 dark:fill-sky-400"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -100,9 +118,9 @@
 		<span>{completedText}</span>
 	</div>
 {:else if completed}
-	<div title="Complete" class="{basicStyle} border-green-800 bg-green-800/10 text-green-800">
+	<div title="Complete" class="{basicStyle} {color.green} ">
 		<svg
-			class="w-5 h-full px-0.5 stroke-green-800 fill-green-800"
+			class="w-5 h-full px-0.5 stroke-green-700 fill-green-700 dark:stroke-green-500 dark:fill-green-500"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -118,9 +136,9 @@
 		<span>{completedText}</span>
 	</div>
 {:else if inProgress && !skipped}
-	<div title="Will save" class=" {basicStyle} border-yellow-800 bg-yellow-800/10 text-yellow-700">
+	<div title="Will save" class=" {basicStyle}  {color.yellow}">
 		<svg
-			class="w-5 h-full px-0.5 stroke-yellow-800 fill-yellow-700/0"
+			class="w-5 h-full px-0.5 {stroke.yellow} {fill.none}"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -136,9 +154,9 @@
 		unsaved
 	</div>
 {:else if skipped}
-	<div title="Will skip" class="{basicStyle} border-yellow-800 bg-yellow-800/10 text-yellow-700">
+	<div title="Will skip" class="{basicStyle}  {color.yellow}">
 		<svg
-			class="w-5 px-0.5 h-full stroke-2 stroke-yellow-800 fill-yellow-800/0"
+			class="w-5 px-0.5 h-full stroke-2 {stroke.yellow} {fill.none}"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"

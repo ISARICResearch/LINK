@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { fly, scale } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { makeFolderLabel } from '$lib/utils/utils';
 	import KabobMenu from '../components/kabobMenu.svelte';
 
@@ -22,7 +22,7 @@
 </script>
 
 {#if profile}
-	<div in:scale|={{ duration: 500, opacity: 0 }} class="w-full p-4 md:max-w-4xl md:mx-auto">
+	<div class="w-full p-4 md:max-w-4xl md:mx-auto">
 		<div class="w-full flex h-10 justify-between">
 			<nav class="text-lg pt-1 font-medium flex">
 				{#each breadCrumbs as crumb, i (crumb.href)}
@@ -45,7 +45,7 @@
 				<KabobMenu />
 			</div>
 		</div>
-		<hr class="dark:text-stone-600 text-stone-700 mt-1 mb-5" />
+		<hr class="dark:text-stone-500 text-stone-700 mt-1 mb-5" />
 		{@render children()}
 	</div>
 {/if}

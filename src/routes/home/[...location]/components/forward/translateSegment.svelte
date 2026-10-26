@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { card } from '$lib/styles';
+	import { card, shadow } from '$lib/styles';
 	import { typeLabels } from '$lib/types';
 	import { fade } from 'svelte/transition';
 
@@ -71,8 +71,10 @@
 				<button
 					title="Translate the following segment into {globalVariables.language}"
 					class=" {!interactable ? ' opacity-50  ' : ''} 
-					{open ? 'cursor-context-menu' : 'bg-stone-500/10 hover:shadow transition-shadow duration-10 shadow-stone-500/50 cursor-pointer'} 
-					flex group items-center text-stone-600 px-2 -ml-2 rounded-full dark:text-stone-400 hover:underline "
+					{open
+						? 'cursor-context-menu'
+						: 'bg-stone-500/10 hover:shadow transition-shadow duration-10 shadow-stone-500/50 cursor-pointer'} 
+					flex group items-center text-stone-600 px-2 -ml-2 rounded-full dark:text-stone-400 hover:underline"
 					onclick={() => {
 						open = !open;
 					}}
@@ -112,10 +114,10 @@
 					<button
 						in:fade={{ duration: 100 }}
 						title="See {suggestionCount ?? 0} suggested translations"
-						class="  flex items-center mr-1 px-2.5 active:opacity-60 rounded-t-md group border-2 border-b-0 text-sm border-stone-800 dark:border-stone-400 cursor-pointer
+						class="  flex items-center mr-1 px-2.5 active:opacity-60 rounded-t-md group border-2 border-b-0 text-sm border-stone-800 dark:border-stone-700/70 cursor-pointer
 						 {suggestionOpen
-							? ' opacity-80 hover:opacity-100 text-stone-200 hover:text-stone-100 hover: bg-stone-800 dark:text-stone-950 dark:bg-stone-400'
-							: 'text-stone-800 dark:text-stone-400  opacity-50 hover:opacity-100'} "
+							? ' opacity-80 hover:opacity-100 text-stone-200 hover:text-stone-100 hover: bg-stone-800 dark:text-stone-200 dark:bg-stone-700'
+							: 'text-stone-800 dark:text-stone-200 opacity-50 hover:opacity-100'} "
 						onclick={() => {
 							suggestionOpen = !suggestionOpen;
 						}}
@@ -133,8 +135,8 @@
 									: suggestionConfidence == 2
 										? 'text-sky-500'
 										: suggestionConfidence == 1
-											? 'text-green-700'
-											: 'text-yellow-700'}"
+											? 'text-green-700 dark:text-green-500'
+											: 'text-yellow-700 dark:text-yellow-500'}"
 								xmlns="http://www.w3.org/2000/svg"
 								width="18"
 								height="24"
@@ -175,10 +177,10 @@
 					<button
 						in:fade={{ duration: 100 }}
 						title="Skip translating this segment"
-						class="  flex items-center px-2.5 rounded-t-md group border-2 border-b-0 text-sm border-stone-800 dark:border-stone-400 cursor-pointer
+						class="  flex items-center px-2.5 active:opacity-60 rounded-t-md group border-2 border-b-0 text-sm border-stone-800 dark:border-stone-700/70 cursor-pointer
 						 {newData.skipped
-							? ' opacity-80 hover:opacity-100 active:opacity-60 text-stone-200 hover:text-stone-100 bg-stone-800 dark:text-stone-950 dark:bg-stone-400'
-							: 'text-stone-800 dark:text-stone-400  active:opacity-60  opacity-50 hover:opacity-100'} "
+							? ' opacity-80 hover:opacity-100 text-stone-200 hover:text-stone-100 hover: bg-stone-800 dark:text-stone-200 dark:bg-stone-700'
+							: 'text-stone-800 dark:text-stone-200 opacity-50 hover:opacity-100'} "
 						onclick={() => {
 							newData.skipped = !newData.skipped;
 							if (newData.skipped) suggestionOpen = false;
@@ -207,10 +209,10 @@
 					<button
 						in:fade={{ duration: 100 }}
 						title="Edit submitted translation"
-						class=" ml-1 flex items-center pl-2.5 active:opacity-60 pr-1 rounded-t-md group border-2 border-b-0 text-sm border-stone-800 dark:border-stone-400 cursor-pointer
+						class=" ml-1 flex items-center px-2.5 active:opacity-60 rounded-t-md group border-2 border-b-0 text-sm border-stone-800 dark:border-stone-700/70 cursor-pointer
 						 {editing
-							? ' opacity-80 hover:opacity-100 text-stone-200 hover:text-stone-100 hover: bg-stone-800 dark:text-stone-950 dark:bg-stone-400'
-							: 'text-stone-800 dark:text-stone-400  opacity-50 hover:opacity-100'} "
+							? ' opacity-80 hover:opacity-100 text-stone-200 hover:text-stone-100 hover: bg-stone-800 dark:text-stone-200 dark:bg-stone-700'
+							: 'text-stone-800 dark:text-stone-200 opacity-50 hover:opacity-100'} "
 						onclick={() => {
 							editing = !editing;
 							if (!editing) suggestionOpen = false;
@@ -265,23 +267,24 @@
 				<div class="w-full border-b-2 border-inherit px-2">
 					{segment}
 				</div>
-				<!--Translation Area-->
-				{#if skipped}
-					<!-- skipped message -->
-					<div class=" w-full px-2 italic opacity-60">Translation Skipped</div>
-				{:else if !interactable}
-					<!-- existing translation -->
-					<div class=" w-full px-2">{submittedData.translation}</div>
-				{:else}
-					<!-- text input translation -->
-					<textarea
-						bind:this={textArea}
-						placeholder="Translate segment here..."
-						class="bg-white z-20 rounded-b dark:bg-stone-800 w-full px-2 min-h-6"
-						rows="1"
-						bind:value={newData.translation}
-					></textarea>
-				{/if}
+				<div class="px-0.5 pt-0.5">
+					<!--Translation Area-->
+					{#if skipped}
+						<!-- skipped message -->
+						<div class=" w-full px-1.5 pb-0.5 italic opacity-60">Translation Skipped</div>
+					{:else if !interactable}
+						<!-- existing translation -->
+						<div class=" w-full px-2">{submittedData.translation}</div>
+					{:else}
+						<textarea
+							bind:this={textArea}
+							placeholder="Translate segment here..."
+							class="bg-white z-20 rounded-[3px] dark:bg-stone-700 w-full px-2 min-h-6 {shadow.soft} dark:shadow-sm"
+							rows="1"
+							bind:value={newData.translation}
+						></textarea>
+					{/if}
+				</div>
 
 				<SuggestedTranslationView
 					{id}

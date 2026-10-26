@@ -45,6 +45,7 @@
 		"@tailwindcss/vite": "^4.0.0",
 		"@types/lodash": "^4.17.24",
 		"@types/papaparse": "^5.3.15",
+		"aws-amplify": "^6.22.2",
 		"jszip": "^3.10.1",
 		"lodash": "^4.17.23",
 		"papaparse": "^5.5.2",

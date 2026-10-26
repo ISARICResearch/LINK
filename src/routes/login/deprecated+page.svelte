@@ -7,6 +7,7 @@
 	import { checkAdminStatus } from '$lib/supabase/auth';
 	import { goto } from '$app/navigation';
 	import { loading } from '../components/loading/loadingState.svelte';
+	import { signInWithRedirect } from 'aws-amplify/auth';
 
 	//let session: AuthSession | null;
 	let email: string = $state('');
@@ -37,10 +38,12 @@
 		loading.message = 'Logging in...';
 		event.preventDefault();
 
+		await signInWithRedirect()
+		
 		const { data, error } = await supabase.auth.signInWithPassword({
 			email: email,
 			password: password
-		});
+		})
 
 		if (error) {
 			loading.active = false;

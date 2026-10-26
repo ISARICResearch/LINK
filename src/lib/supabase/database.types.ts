@@ -43,7 +43,7 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           score: string
           translation_id: number
@@ -52,7 +52,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           score?: string
           translation_id: number
@@ -61,13 +61,20 @@ export type Database = {
         Update: {
           created_at?: string
           id?: number
-          language?: Database["public"]["Enums"]["Language"]
+          language?: string
           original_id?: number
           score?: string
           translation_id?: number
           translation_step?: Database["public"]["Enums"]["TranslationStep"]
         }
         Relationships: [
+          {
+            foreignKeyName: "accepted_translations_language_fk"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "accepted_translations_original_id_fkey"
             columns: ["original_id"]
@@ -89,7 +96,7 @@ export type Database = {
           comment: string | null
           created_at: string
           id: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           skipped: boolean
           translation: string | null
@@ -100,7 +107,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           skipped?: boolean
           translation?: string | null
@@ -111,7 +118,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: number
-          language?: Database["public"]["Enums"]["Language"]
+          language?: string
           original_id?: number
           skipped?: boolean
           translation?: string | null
@@ -119,6 +126,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "backward_translations_language_fk"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "backward_translations_original_id_fkey"
             columns: ["original_id"]
@@ -171,7 +185,7 @@ export type Database = {
           comment: string
           created_at: string
           id: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           skipped: boolean
           translation: string | null
@@ -181,7 +195,7 @@ export type Database = {
           comment?: string
           created_at?: string
           id?: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           skipped: boolean
           translation?: string | null
@@ -191,13 +205,20 @@ export type Database = {
           comment?: string
           created_at?: string
           id?: number
-          language?: Database["public"]["Enums"]["Language"]
+          language?: string
           original_id?: number
           skipped?: boolean
           translation?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "forward_translations_language_fk"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "forward_translations_original_id_fkey"
             columns: ["original_id"]
@@ -213,6 +234,18 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      languages: {
+        Row: {
+          id: string
+        }
+        Insert: {
+          id: string
+        }
+        Update: {
+          id?: string
+        }
+        Relationships: []
       }
       original_segments: {
         Row: {
@@ -246,8 +279,9 @@ export type Database = {
       }
       profiles: {
         Row: {
-          clinical_expertise: boolean | null
+          cognito_id: string | null
           created_at: string
+          email: string | null
           id: string
           is_admin: boolean
           language: string | null
@@ -256,8 +290,9 @@ export type Database = {
           selected_preset: string
         }
         Insert: {
-          clinical_expertise?: boolean | null
+          cognito_id?: string | null
           created_at?: string
+          email?: string | null
           id: string
           is_admin?: boolean
           language?: string | null
@@ -266,8 +301,9 @@ export type Database = {
           selected_preset?: string
         }
         Update: {
-          clinical_expertise?: boolean | null
+          cognito_id?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           is_admin?: boolean
           language?: string | null
@@ -275,7 +311,15 @@ export type Database = {
           profession?: string | null
           selected_preset?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_language_fk"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       translation_progress: {
         Row: {
@@ -283,7 +327,7 @@ export type Database = {
           automated_comments: string[] | null
           created_at: string
           id: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           translation_step: Database["public"]["Enums"]["TranslationStep"]
         }
@@ -292,7 +336,7 @@ export type Database = {
           automated_comments?: string[] | null
           created_at?: string
           id?: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           translation_step: Database["public"]["Enums"]["TranslationStep"]
         }
@@ -301,11 +345,18 @@ export type Database = {
           automated_comments?: string[] | null
           created_at?: string
           id?: number
-          language?: Database["public"]["Enums"]["Language"]
+          language?: string
           original_id?: number
           translation_step?: Database["public"]["Enums"]["TranslationStep"]
         }
         Relationships: [
+          {
+            foreignKeyName: "translation_progress_language_fk"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "translation_progress_original_id_fkey"
             columns: ["original_id"]
@@ -320,7 +371,7 @@ export type Database = {
           comments: Json
           created_at: string
           id: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           reviewer_id: string
           translation_id: number | null
@@ -329,7 +380,7 @@ export type Database = {
           comments: Json
           created_at?: string
           id?: number
-          language: Database["public"]["Enums"]["Language"]
+          language: string
           original_id: number
           reviewer_id: string
           translation_id?: number | null
@@ -338,12 +389,19 @@ export type Database = {
           comments?: Json
           created_at?: string
           id?: number
-          language?: Database["public"]["Enums"]["Language"]
+          language?: string
           original_id?: number
           reviewer_id?: string
           translation_id?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "translation_reviews_language_fk"
+            columns: ["language"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "translation_reviews_original_id_fkey"
             columns: ["original_id"]
@@ -409,6 +467,26 @@ export type Database = {
           valid_forward_text: string
           valid_forward_user: string
         }[]
+      }
+      retrieve_profile: {
+        Args: never
+        Returns: {
+          cognito_id: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_admin: boolean
+          language: string | null
+          name: string | null
+          profession: string | null
+          selected_preset: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {

@@ -1,12 +1,10 @@
-import type { TranslationLanguage } from '$lib/types';
-
 export type GloabalVariables = {
-	language: TranslationLanguage;
+	language: string;
 	document: string;
 };
 export const globalVariables: GloabalVariables = $state({ language: 'spanish', document: '' });
 
-export const setLanguage = (l: TranslationLanguage) => {
+export const setLanguage = (l: string) => {
 	globalVariables.language = l;
 };
 

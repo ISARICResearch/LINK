@@ -1,9 +1,6 @@
-import type { TranslationLanguage } from '$lib/types';
+import '$lib/amplify'
 import { buildLocationTree, computeCompletion, type LocationNode } from '$lib/utils/locationTree';
-//import { createSlugMapping } from '$lib/utils/slug';
 import type { LayoutLoad } from './$types';
-//import { redirect } from '@sveltejs/kit';
-
 import type {
 	DocumentRow,
 	ForwardTranslationRow,
@@ -13,61 +10,55 @@ import type {
 } from '$lib/supabase/types';
 import { pullOriginalRowsById, pullRowsForOriginalId } from '$lib/supabase/utils';
 import { supabase } from '../../supabaseClient';
-import { redirect } from '@sveltejs/kit';
 import { loading } from '../components/loading/loadingState.svelte';
 import { setDocument, setLanguage } from './global.svelte';
+import { getCurrentUser } from 'aws-amplify/auth';
 
-export const ssr = false; // Force client-side for authentication
-
-const timeStamps: number[] = [];
-
-// & print time since last call + a message
-const printTime = (message: string = '') => {
-	timeStamps.push(performance.now());
-	const A = timeStamps.at(-1);
-	const B = timeStamps.at(-2);
-	if (A && B) console.log(message + ' - ' + String(A - B));
-	else if (message != '') console.log(message);
-};
+export const ssr = false;
 
 // == on load home page or children == //
 export const load: LayoutLoad = async ({ parent, depends }) => {
 	loading.message = 'Getting document...';
 	loading.active = true;
-	printTime();
 
-	const { session, profile, document } = await parent();
+	console.time('/home/ check user');
+	console.log('home, Check user is signed in...');
+	const { username, userId, signInDetails } = await getCurrentUser();
+	console.log('home, Check user is signed in RESULT:', username, userId, signInDetails);
 
-	printTime('loaded session, profile, document');
+	console.timeEnd('/home/ check user');
 
-	// ! catch not logged in
-	if (!session || !profile) {
-		console.warn(session, profile);
-		if (!profile && session) await supabase.auth.signOut();
-		redirect(302, '/login');
-	}
+	console.time('/home/ handle profile');
+	const { profile, document } = await parent();
+	console.timeEnd('/home/ handle profile');
 
 	depends('app:data');
-	setLanguage(profile.language as TranslationLanguage);
-	setDocument(profile.selected_preset);
-	
+	if (profile && profile.language) {
+		setLanguage(profile.language);
+		setDocument(profile.selected_preset);
+	}
+
 	loading.active = false;
+
+	console.timeEnd('Load /home/');
+
+	if (!profile || !profile.language) {
+		return;
+	}
+
 	return {
 		profile,
 		document,
-		dataPromise: loadDataProgressively(
-			session.user.id,
-			profile.language as TranslationLanguage,
-			document
-		)
+		dataPromise: loadDataProgressively(profile.id, profile.language, document)
 	};
 };
 
 async function loadDataProgressively(
 	userId: string,
-	language: TranslationLanguage,
+	language: string,
 	document: DocumentRow | null
 ) {
+	console.time('/home/ pulling data');
 	loading.message = 'Pulling segments...';
 	loading.active = true;
 	const segmentMap: SegmentMap = {};
@@ -97,7 +88,8 @@ async function loadDataProgressively(
 		),
 		await supabase.from('documents').select('id, title, version')
 	]);
-	printTime('pulled all data');
+	console.time('/home/ pulling data');
+	console.time('/home/ computing data');
 
 	// = ( 2 ) = Create Segment map from original segments
 	(original_segments || []).forEach((segment) => {
@@ -154,134 +146,13 @@ async function loadDataProgressively(
 			documentMap[document.title].push(document);
 		}
 	}*/
-
-	printTime('computed node completions');
-	console.log('== complete ==');
+	console.time('/home/ computing data');
+	console.log('/home/ == complete ==');
 
 	loading.active = false;
 	return {
 		segmentMap,
 		locationTree,
-
-		//slugMapping,
 		documents
 	};
 }
-
-/*
-	@ to-do after (1) updating how arc is pulled in && (2) getting segment_ids[] on layout load
-	[ ] Promise.all from Original_segment ids for os, ft, tr, tp
-	 ✓  Build segment map
- 	 ✓  location tree
-	 ✓  slug mapping
-	 ✓  calculate completions
-	*/
-
-// = ( 1 ) = Load original segments
-
-// @ will change to just pull original_ids[] with paginate query, no focus on version or preset, although they are stored.
-// @ will also put below as part of promise all
-//const original_segments = await pullOriginalSegments(undefined, undefined);
-//timeStamp[1] = performance.now();
-//console.log('original_segments found in', timeStamp[1] - timeStamp[0], 'ms');
-
-/*
-old code
-
-	// !-- Gets all progress when should only get ones for loaded original segments, and should paginate
-	const translation_progress = await pullTranslationProgressForSegments(language, segmentIds);
-
-	// Get all of users forward translations
-	const ft_query = supabase.from('forward_translations').select('*').eq('user_id', userId);
-	const { data: forward_translations } = await paginateQuery(ft_query, 1000);
-
-	// Get all of users reviews
-	const review_query = supabase.from('translation_reviews').select('*').eq('reviewer_id', userId);
-	const { data: translation_reviews } = await paginateQuery(review_query, 1000);
-*/
-
-/*
-
-	To do this, we need to load all items from superbase that have an id in SegmentMap and are this language - IE, all reviews for a given segment
-
-	Actually, we care about if the user has completed a translation, just them, and then ALL translations separately.
-	Unique to user if "original_id & language & user"... really just "original_id & user", but then we double check it is the right language, just to be safe
-
-	What is the process?
-		1. Pull all ForwardTranslations for a given segment and language
-			* this is to show all options to select from
-		2. Pull all TranslationReviews for a given segment and language
-			* this is to show all comments made thus far on them by reviewers
-
-
-	In one review, a user will look at all questions, make comments about them that they find to be true "oh this one is wrong this way, or this one is wrong this way"
-	*/
-
-/*
-
-Next steps:
-1. get and store all locations on layout load - location tree?
-2. If at a location with at least one thing in it, show the form to submit instead.
-3. On submit form, simply add items to forward tree.
-
-4. Get UI from past stuff, get it pretty
-5. Load stuff stategically, maybe only original items on load, pulling in then progress, forward translations, reviews, and backward translations.
-
-
-NEW:
-1. Load original_segments properly (map location and be done), and then return
-2. After load, create new segmentMap to map original segment ids to progress, ft, reviews (get user reviews and relevent forward translations), and backward translation
-	upon each loaded item, update segmentMap
-3. Have child +page use segmentMap for the filtered relavent original_ids and pass that into forward_translation, reviews, and backward translations.
-	So for each +page, filter data.segmentMap into pageSegmentMap
-
-	async function fetchData() {
-		if (!session || !profile) throw redirect(505, '/login');
-		if (!profile.language) {
-			// You could redirect or return early
-			return {
-				profile,
-				segmentMap,
-				locationTree: null,
-				slugMapping: null
-			};
-		}
-		const language = profile.language as TranslationLanguage;
-
-		const original_segments = await pullOriginalSegments();
-
-		// First, create a base map with all original segments
-		(original_segments || []).forEach((segment) => {
-			segmentMap[segment.id] = {
-				originalSegment: segment,
-				translationProgress: null as never, // We'll populate this next
-				forwardTranslation: null
-			};
-		});
-
-		// Build tree and mapping
-		const locationTree = buildLocationTree(original_segments || []);
-		const slugMapping = createSlugMapping(original_segments || []);
-
-		const { data: translation_progress } = await supabase
-			.from('translation_progress')
-			.select('*')
-			.eq('language', language);
-
-		// Then, add translation progress data
-		(translation_progress || []).forEach((t) => {
-			if (segmentMap[t.original_id]) segmentMap[t.original_id].translationProgress = t;
-		});
-
-		const { data: forward_translations } = await supabase
-			.from('forward_translations')
-			.select('*')
-			.eq('user_id', session.user.id);
-
-		// Finally, add forward translations data
-		(forward_translations || []).forEach((ft) => {
-			if (segmentMap[ft.original_id]) segmentMap[ft.original_id].forwardTranslation = ft;
-		});
-	}
-
-*/

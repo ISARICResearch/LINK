@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { button } from '$lib/styles';
-	import { signInWithRedirect } from 'aws-amplify/auth';
+	import { fetchAuthSession, signInWithRedirect, signOut } from 'aws-amplify/auth';
 	import ThemeManager from './components/themeManager.svelte';
+	import { goto } from '$app/navigation';
+	import { supabase } from '../supabaseClient';
 
 	const _buttonStyle =
 		'w-full max-w-80 text-xl m-auto block text-center rounded-xl cursor-pointer mb-2 p-0.5 border-2 hover:bg-stone-50 border-stone-500 dark:hover:bg-stone-900 dark:hover:border-stone-300 hover:border-stone-600';
@@ -18,7 +20,7 @@
 	<div class=" rounded-lg w-full mt-10 max-w-2xl mx-auto">
 		<div class="flex-wrap px-4">
 			<p class="text-2xl font-semibold mb-4 text-center">
-				Are you fluent in English and <br/>Spanish, French, or Portuguese?
+				Are you fluent in English and <br />Spanish, French, or Portuguese?
 			</p>
 			<p class="font-normal text-lg text-center">
 				Help translate ISARIC's ARC database of CRF questions so that our Bridge is more accessible
@@ -49,11 +51,72 @@
 
 			<button
 				onclick={async () => {
-					await signInWithRedirect();
+					'Clicked: signInWithRedirect()';
+					const session = await fetchAuthSession();
+					console.log(
+						'session',
+						session.tokens?.idToken?.payload.sub,
+						session.tokens?.idToken?.payload
+					);
+					if (session.tokens?.idToken?.payload.sub) goto('/home');
+					else await signInWithRedirect();
 				}}
 				class=" w-full block max-w-80 m-auto text-4xl font-semibold rounded-xl border-4 cursor-pointer p-5 text-center {button
 					.green.default} {button.green.hover}">Sign In</button
 			>
+
+			<button
+				onclick={async () => {
+					const { data: profile, error } = await supabase.rpc('retrieve_profile');
+					console.log('retrieve_profile BUTTON', profile, error);
+				}}
+				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+					.green.default} {button.green.hover}"
+			>
+				retrieve_profile
+			</button>
+			<button
+				onclick={async () => {
+					const { data, error } = await supabase.rpc('test_auth');
+					console.log('test_auth BUTTON', data, error);
+				}}
+				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+					.green.default} {button.green.hover}"
+			>
+				test_auth
+			</button>
+			<button
+				onclick={async () => {
+					const { tokens } = await fetchAuthSession();
+					console.log(tokens?.idToken?.payload);
+				}}
+				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+					.green.default} {button.green.hover}"
+			>
+				tokens
+			</button>
+			<button
+				onclick={() => signOut()}
+				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+					.green.default} {button.green.hover}"
+			>
+				sign out
+			</button>
+
+			<button
+				onclick={async () => {
+					console.log('server link_profile');
+					const res = await fetch('api/link_profile', {
+						method: 'POST'
+					});
+
+					console.log('res', res);
+				}}
+				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+					.green.default} {button.green.hover}"
+			>
+				link_profile
+			</button>
 		</div>
 	</div>
 

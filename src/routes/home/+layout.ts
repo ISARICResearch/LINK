@@ -1,4 +1,4 @@
-import '$lib/amplify'
+import '$lib/amplify';
 import { buildLocationTree, computeCompletion, type LocationNode } from '$lib/utils/locationTree';
 import type { LayoutLoad } from './$types';
 import type {
@@ -26,25 +26,19 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 	const { username, userId, signInDetails } = await getCurrentUser();
 	console.log('home, Check user is signed in RESULT:', username, userId, signInDetails);
 
-	console.timeEnd('/home/ check user');
-
 	console.time('/home/ handle profile');
 	const { profile, document } = await parent();
 	console.timeEnd('/home/ handle profile');
 
-	depends('app:data');
-	if (profile && profile.language) {
-		setLanguage(profile.language);
-		setDocument(profile.selected_preset);
-	}
-
 	loading.active = false;
 
-	console.timeEnd('Load /home/');
+	depends('app:data');
 
-	if (!profile || !profile.language) {
-		return;
-	}
+	if (!profile) return { profile: null, document: null, dataPromise: null };
+	if (!profile.language ) return { profile, document: null, dataPromise: null };
+
+	setLanguage(profile.language);
+	setDocument(profile.selected_preset);
 
 	return {
 		profile,

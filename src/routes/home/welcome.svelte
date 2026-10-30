@@ -1,26 +1,6 @@
 <script lang="ts">
 	import { capitalizeFirstLetter } from '$lib/utils/utils';
-
-	let {
-		profile
-	}: {
-		profile: {
-			clinical_expertise: boolean | null;
-			created_at: string;
-			id: string;
-			is_admin: boolean;
-			language: string | null;
-			name: string | null;
-			profession: string | null;
-			selected_preset: string | null;
-		};
-	} = $props();
-
-	let weekOut =
-		new Date().toJSON().slice(0, 8) + (+new Date().toJSON().slice(8, 10) + 7).toString();
-	let firstSteps = $derived(profile.created_at.slice(0, 10) < weekOut);
-	$inspect(profile.created_at.slice(0, 10), weekOut, firstSteps, '2026-06-01' < '2026-06-2');
-	const language = $derived(capitalizeFirstLetter(profile.language ?? ""));
+	import { globalVariables } from './global.svelte';
 </script>
 
 <div class="w-full text-stone-800 dark:text-stone-300">
@@ -35,8 +15,9 @@
 		</h1>
 
 		<p class="text-center text-xl p-6 font-serif">
-			Welcome, {profile.name}. <br />Thank you for your time and energy translating <b>ARC</b> into
-			<b>{language}</b>. <br />Your translations are helping people around the world!
+			Welcome. <br />Thank you for your time and energy translating <b>ARC</b> into
+			<b>{capitalizeFirstLetter(globalVariables.language)}</b>. <br />Your translations are helping
+			people around the world!
 		</p>
 	</div>
 </div>

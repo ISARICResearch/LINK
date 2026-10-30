@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "12.2.3"
   }
   graphql_public: {
     Tables: {
@@ -468,6 +468,26 @@ export type Database = {
           valid_forward_user: string
         }[]
       }
+      link_profile: {
+        Args: { p_email: string; p_sub: string }
+        Returns: {
+          cognito_id: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_admin: boolean
+          language: string | null
+          name: string | null
+          profession: string | null
+          selected_preset: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       retrieve_profile: {
         Args: never
         Returns: {
@@ -487,6 +507,11 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      test_auth: { Args: never; Returns: Json }
+      update_profile: {
+        Args: { u_lang: string; u_prof: string }
+        Returns: undefined
       }
     }
     Enums: {

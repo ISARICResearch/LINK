@@ -17,7 +17,7 @@ const attemptLinkProfile = async () => {
 
 	if (!idToken || !accessToken) throw new Error('not signed in');
 
-	const res = await fetch('api/link-profile', {
+	const res = await fetch('/api/link-profile', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ idToken, accessToken })
@@ -86,7 +86,7 @@ export const load: LayoutLoad = async () => {
 	if (error) console.error(error);
 	if (profile?.id) {
 		console.log('LOGIN: Signing in with existing profile', profile);
-		const document = getDocument(profile);
+		const document = await getDocument(profile);
 		return {
 			profile,
 			document
@@ -96,9 +96,9 @@ export const load: LayoutLoad = async () => {
 		const linked_profile = await attemptLinkProfile();
 		if (linked_profile?.id) {
 			console.log('LOGIN: Signing in with newly linked profile', linked_profile);
-			const document = getDocument(linked_profile);
+			const document = await getDocument(linked_profile);
 			return {
-				linked_profile,
+				profile: linked_profile,
 				document
 			};
 		}

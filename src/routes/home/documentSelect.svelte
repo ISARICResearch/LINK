@@ -5,22 +5,14 @@
 	import { supabase } from '../../supabaseClient';
 	import { generateDocumentName } from '$lib/utils/utils';
 	import Info from './info.svelte';
+	import type { Profile } from '$lib/types';
 
 	let {
 		documents,
 		profile
 	}: {
 		documents: { id: number; title: string; version: string }[];
-		profile: {
-			clinical_expertise: boolean | null;
-			created_at: string;
-			id: string;
-			is_admin: boolean;
-			language: string | null;
-			name: string | null;
-			profession: string | null;
-			selected_preset: string | null;
-		};
+		profile: Profile;
 	} = $props();
 
 	async function handlePresetChange(preset: undefined | string) {
@@ -174,7 +166,7 @@
 
 			<p
 				title="ARC is in version {archVersion}"
-				class="w-full flex font-semibold  items-center justify-center italic cursor-context-menu text-center text-sm text-stone-700 dark:text-stone-500"
+				class="w-full flex font-semibold items-center justify-center italic cursor-context-menu text-center text-sm text-stone-700 dark:text-stone-500"
 			>
 				<span class="h-4 w-4 mr-0.5">
 					<Info />

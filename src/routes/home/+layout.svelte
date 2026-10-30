@@ -4,9 +4,7 @@
 	import { makeFolderLabel } from '$lib/utils/utils';
 	import KabobMenu from '../components/kabobMenu.svelte';
 
-	let { children, data } = $props();
-
-	let profile = $derived(data.profile);
+	let { children } = $props();
 
 	// Get nav working
 	let pathSegments = $derived(page.url.pathname.split('/').filter(Boolean));
@@ -21,31 +19,29 @@
 	);
 </script>
 
-{#if profile}
-	<div in:scale|={{ duration: 500, opacity: 0 }} class="w-full p-4 md:max-w-4xl md:mx-auto">
-		<div class="w-full flex h-10 justify-between">
-			<nav class="text-lg pt-1 font-medium flex">
-				{#each breadCrumbs as crumb, i (crumb.href)}
-					<span class="inline-flex items-center" transition:fly={{ x: -3, duration: 150 }}>
-						<a
-							data-sveltekit-preload-code="eager"
-							class="cursor-pointer hover:underline active:text-stone-500 mr-1"
-							href={crumb.href}
-						>
-							{crumb.name}
-						</a>
-						{#if i < breadCrumbs.length - 1}
-							<span transition:fly={{ x: -3, duration: 150 }}> >&nbsp</span>
-						{/if}
-					</span>
-				{/each}
-			</nav>
+<div in:scale|global={{ duration: 500, opacity: 0 }} class="w-full p-4 md:max-w-4xl md:mx-auto">
+	<div class="w-full flex h-10 justify-between">
+		<nav class="text-lg pt-1 font-medium flex">
+			{#each breadCrumbs as crumb, i (crumb.href)}
+				<span class="inline-flex items-center" transition:fly={{ x: -3, duration: 150 }}>
+					<a
+						data-sveltekit-preload-code="eager"
+						class="cursor-pointer hover:underline active:text-stone-500 mr-1"
+						href={crumb.href}
+					>
+						{crumb.name}
+					</a>
+					{#if i < breadCrumbs.length - 1}
+						<span transition:fly={{ x: -3, duration: 150 }}> >&nbsp</span>
+					{/if}
+				</span>
+			{/each}
+		</nav>
 
-			<div class="h-50 min-w-9">
-				<KabobMenu />
-			</div>
+		<div class="h-50 min-w-9">
+			<KabobMenu />
 		</div>
-		<hr class="dark:text-stone-600 text-stone-700 mt-1 mb-5" />
-		{@render children()}
 	</div>
-{/if}
+	<hr class="dark:text-stone-600 text-stone-700 mt-1 mb-5" />
+	{@render children()}
+</div>

@@ -64,7 +64,7 @@
 				class=" w-full block max-w-80 m-auto text-4xl font-semibold rounded-xl border-4 cursor-pointer p-5 text-center {button
 					.green.default} {button.green.hover}">Sign In</button
 			>
-
+			<!--
 			<button
 				onclick={async () => {
 					const { data: profile, error } = await supabase.rpc('retrieve_profile');
@@ -116,7 +116,7 @@
 					.green.default} {button.green.hover}"
 			>
 				link_profile
-			</button>
+			</button>-->
 		</div>
 	</div>
 

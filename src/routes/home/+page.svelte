@@ -106,20 +106,15 @@
 					class="max-w-2xl bg-stone-300/50 dark:bg-stone-950/40 rounded-xl p-4 pb-5 px-8 shadow {shadow.color} mt-20 mx-auto"
 					transition:fly|global={{ y: 15 }}
 				>
-					<h3 class="font-medium text-lg">Translated Segments</h3>
-					<div
-						class="max-w-2xl bg-stone-300/50 dark:bg-stone-900/50 rounded-xl p-4 px-8 shadow {shadow.color} mt-20 mx-auto"
-						transition:fly={{ y: 15 }}
-					>
 						<h3 class="font-medium text-lg">Translated Segments</h3>
 						<div
-							class="border-0 shadow-inner mb-5 z-10 rounded-lg max-h-30 overflow-auto {shadow.soft}"
+							class="border-0 mb-5 shadow-inner z-10 rounded-lg max-h-30 overflow-auto {shadow.soft}"
 						>
 							{#each Object.entries(loadedData.segmentMap).filter(([_id, v]) => v.forwardTranslation != null) as [id, v]}
 								{@const slug = getSegmentSlug(+id, loadedData.locationTree, '/home')}
 								<a
-									class="px-2 flex text-sky-800 dark:text-sky-500 z-0 hover:underline border-b border-stone-400 hover:bg-stone-100 active:bg-stone-300"
-									href={slug}
+									class="px-2 flex text-sky-800 dark:text-sky-400/80 z-0 hover:underline border-b active:opacity-60 border-stone-400 hover:bg-stone-100 dark:border-stone-700/70 dark:hover:bg-stone-700 dark:hover:text-sky-400"
+								href={slug}
 								>
 									<!--
 							<span>
@@ -154,6 +149,7 @@
 							{/each}
 						</div>
 					</div>
+					
 				{/if}
 			{/if}
 		{/await}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { fly } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import { makeFolderLabel } from '$lib/utils/utils';
 	import KabobMenu from '../components/kabobMenu.svelte';
 
@@ -41,7 +41,8 @@
 		<div class="h-50 min-w-9">
 			<KabobMenu />
 		</div>
-		<hr class="dark:text-stone-500 text-stone-700 mt-1 mb-5" />
-		{@render children()}
+		
 	</div>
+	<hr class="dark:text-stone-500 text-stone-700 mt-1 mb-5" />
+		{@render children()}
 </div>

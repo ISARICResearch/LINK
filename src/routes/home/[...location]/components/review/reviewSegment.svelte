@@ -117,10 +117,14 @@
 </div>
 
 <!-- Main Content-->
-<div class="flex pl-4 w-full h-full transition-all {open ? ' max-h-300 duration-500 ' : 'max-h-0'}">
+<div
+	class="flex pl-4 w-full h-full border-inherit transition-all {open
+		? ' max-h-300 duration-500 '
+		: 'max-h-0'}"
+>
 	<!-- Review Form -->
 	{#if open}
-		<div class="w-full mr-6 h-full">
+		<div class="w-full border-inherit mr-6 h-full">
 			<div
 				in:fade={{ duration: 200 }}
 				class="rounded border-2 border-inherit w-full h-full z-0 flex flex-wrap {completed
@@ -137,13 +141,13 @@
 				{#if options}
 					{#each Object.entries(options) as [text, option], _index}
 						{@const optionId:number = getEarliestEvent(Object.values(option)).id}
-						<div class="relative w-full">
+						<div class="relative border-inherit w-full">
 							<fieldset id={segment} class="w-full flex border-inherit" role="radiogroup">
 								<!-- Option -->
 								<label
 									class="w-1/2 {completed
 										? ' '
-										: ' hover:bg-stone-100  cursor-pointer '}  border-r border-t border-inherit px-2"
+										: ' hover:bg-stone-100 dark:hover:bg-stone-700/70 cursor-pointer '}  border-r border-t border-inherit px-2"
 								>
 									<input
 										type="radio"
@@ -160,7 +164,7 @@
 												selectedTranslation = optionId; // Select
 											}
 										}}
-										class=" disabled:accent-amber-300 {completed
+										class="dark:scheme-dark disabled:accent-amber-300 {completed
 											? ' '
 											: 'cursor-pointer'}"
 									/>
@@ -169,7 +173,7 @@
 
 								<!-- Option's Comments -->
 								<div
-									class="w-1/2 border-l px-2 flex font-normal text-stone-800 italic border-t border-inherit overflow-y-auto"
+									class="w-1/2 px-2 flex font-normal text-stone-800 dark:text-stone-300 italic border-t border-inherit overflow-y-auto"
 								>
 									{#each commentMap[text] as comment, i}
 										{comment}
@@ -198,13 +202,13 @@
 				{#if completed}
 					<!-- existing translations and comment -->
 					<div class=" w-1/2 border-r px-2">{ftranslation}</div>
-					<div class=" w-1/2 border-l px-2">{fcomment}</div>
+					<div class=" w-1/2 px-2">{fcomment}</div>
 				{:else}
-					<div class=" border-t-2 border-t-stone-400 w-1/2 border-r flex min-h-full border-inherit">
+					<div class=" border-t-2 w-1/2 border-r flex min-h-full border-inherit">
 						<label
 							class=" pl-2 pr-3 border-inherit rounded-b-md flex {completed
 								? ' '
-								: ' hover:bg-stone-100  cursor-pointer '}"
+								: ' hover:bg-stone-100 dark:hover:bg-stone-700/70  cursor-pointer '}"
 						>
 							<input
 								type="radio"
@@ -220,7 +224,7 @@
 										selectedTranslation = 'new'; // Select
 									}
 								}}
-								class="disabled:accent-amber-300 {completed
+								class=" dark:scheme-dark disabled:accent-amber-300 {completed
 									? ' '
 									: 'cursor-pointer'}"
 							/>
@@ -229,7 +233,7 @@
 						<!-- translation input -->
 						<textarea
 							placeholder="Translate segment here..."
-							class="resize-none bg-white border-inherit w-full dark:bg-black px-2"
+							class="resize-none bg-white border-inherit w-full dark:bg-stone-700 px-2"
 							rows="1"
 							bind:value={ftranslation}
 							onkeydown={() => {
@@ -239,11 +243,11 @@
 						></textarea>
 					</div>
 
-					<div class="w-1/2 border-t-2 border-t-stone-400 border-l min-h-full border-inherit">
+					<div class="w-1/2 border-t-2 min-h-full border-inherit">
 						<!-- comment input -->
 						<textarea
 							placeholder="Provide justification here..."
-							class="bg-white h-5 border-inherit dark:bg-black rounded-br w-full min-h-full px-2"
+							class="bg-white h-5 border-inherit dark:bg-stone-700 rounded-br w-full min-h-full px-2"
 							rows="1"
 							bind:value={fcomment}
 							onkeydown={() => {

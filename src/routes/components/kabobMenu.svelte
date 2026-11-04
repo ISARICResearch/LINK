@@ -7,7 +7,7 @@
 	let isDark = $state(document.documentElement.classList.contains('dark'));
 
 	const buttonStyle =
-		'h-7 flex justify-left cursor-pointer hover:bg-white dark:hover:bg-stone-800 rounded-md opacity-70 hover:opacity-100';
+		'h-7 flex justify-left cursor-pointer hover:bg-white dark:hover:bg-stone-700 rounded-md opacity-70 hover:opacity-100 active:opacity-50';
 
 	// Handle clicks outside the menu
 	function handleClickOutside(event: MouseEvent) {
@@ -46,7 +46,7 @@
 		<div
 			transition:fly={{ x: 15, duration: 75 }}
 			class="flex z-10 flex-col font-semibold text-sm overflow-hidden border shadow w-44 h-auto absolute -translate-x-36 -translate-y-1 rounded-lg
-            dark:bg-stone-950 dark:border-stone-600 bg-stone-200 border-stone-700 dark:shadow-black shadow-stone-400"
+            dark:bg-stone-900 dark:border-stone-600 bg-stone-200 border-stone-700 dark:shadow-black shadow-stone-400"
 		>
 			<div class="border-inherit p-1 space-y-0.5 flex flex-col">
 				<button

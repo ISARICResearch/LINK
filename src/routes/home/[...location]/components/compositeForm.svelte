@@ -26,6 +26,7 @@
 	} from './compositeForm';
 	import ReviewSegment from './review/reviewSegment.svelte';
 	import { invalidate } from '$app/navigation';
+	import { globalVariables } from '../../global.svelte';
 
 	let {
 		segmentMap,
@@ -138,7 +139,7 @@
 		if (changeCount > 0) {
 			loading.active = true;
 			loading.message = 'Submitting...';
-			
+
 			// Handle organizing and submitting changes to SupaBase
 			await handlePageTranslationSubmission(pageSubmissions, profile, changed);
 
@@ -175,22 +176,36 @@
 	function warmContinue(){}*/
 </script>
 
-<h1 class="font-semibold text-3xl text-center my-4 ml-5 text-stone-600 dark:text-stone-400">
+<h1 class="font-semibold text-3xl text-center my-4 ml-5 text-stone-600 dark:text-stone-300">
 	{pageTitle}
 </h1>
-<p class="font-normal flex text-md px-20 justify-center text-stone-700 dark:text-stone-300">
-	<span class=" {fsegments == 0 ? 'opacity-30' : ''} gap-1 inline-flex items-center px-4 mr-1">
+<p class="font-normal flex text-md px-20 justify-center text-stone-700 dark:text-stone-200">
+	<span
+		title="Write {fsegments} English segement{fsegments != 1
+			? 's'
+			: ''} in {globalVariables.language}"
+		class=" {fsegments == 0
+			? 'opacity-30'
+			: ''} gap-1 cursor-context-menu inline-flex group items-center px-4 mr-1"
+	>
 		<span
 			class=" mr-0.5 rounded-full w-2 h-2 {fsegments == 0
 				? 'bg-stone-500/40 '
-				: 'bg-green-700/40 '}"
+				: 'bg-green-700/40 group-hover:bg-green-700/60 dark:bg-green-500/50 dark:group-hover:bg-green-500/70'}"
 		></span>
 		Translate <b>{fsegments}</b>
 		<!--segment{fsegments == 1 ? '' : 's'}-->
 	</span>
-	<span class="{rsegments == 0 ? 'opacity-30' : ''} gap-1 inline-flex items-center px-4 ml-1">
+	<span
+		title="Select the best translation for {rsegments} segment{rsegments != 1 ? 's' : ''}"
+		class="{rsegments == 0
+			? 'opacity-30'
+			: ''} gap-1 inline-flex items-center px-4 ml-1 cursor-context-menu group"
+	>
 		<span
-			class="mr-0.5 rounded-full w-2 h-2 {rsegments == 0 ? 'bg-stone-500/40 ' : 'bg-sky-500/40'}"
+			class="mr-0.5 rounded-full w-2 h-2 {rsegments == 0
+				? 'bg-stone-500/40 '
+				: 'bg-sky-500/40 group-hover:bg-sky-500/60 dark:bg-sky-500/50 dark:group-hover:bg-sky-500/70'}"
 		></span>
 		Review <b>{rsegments}</b>
 
@@ -312,9 +327,10 @@
 
 <!-- Back, Save, Continue -->
 
-<div class="w-full mt-2 justify-between px-3 m-auto flex">
+<div class="w-full mt-2 items-center justify-between px-3 m-auto flex">
 	<!-- Back -->
 	<button
+		title={canSave ? 'Save and go to Previous Segment' : 'Go to Previous Segment'}
 		data-sveltekit-preload-data="hover"
 		onclick={async () => {
 			saving = true;
@@ -333,12 +349,13 @@
 
 	<!-- Save -->
 	<button
+		title={canSave ? 'Save data' : ''}
 		onclick={async () => {
 			saving = true;
 			await handleSubmit(false, false);
 			saving = false;
 		}}
-		class="{button.stone}  text-lg right-0 font-semibold {canSave
+		class="{button.stone} text-lg p-0.5 right-0 font-semibold {canSave
 			? 'opacity-90 hover:opacity-100 hover:shadow-sm cursor-pointer ' + button.stoneHover
 			: 'opacity-40'} px-4 rounded-xl"
 	>
@@ -347,6 +364,7 @@
 
 	<!-- Save & Continue -->
 	<button
+		title={canSave ? 'Save and go to Next Segment' : 'Go to Next Segment'}
 		data-sveltekit-preload-data="hover"
 		onclick={async () => {
 			saving = true;

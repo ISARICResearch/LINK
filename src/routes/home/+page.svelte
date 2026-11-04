@@ -19,10 +19,10 @@
 </script>
 
 <div in:fade|global={{ duration: 500, delay: 100 }} out:fade|global={{ duration: 100 }}>
-	<div class="mx-auto w-full justify-center flex mt-8 opacity-70">
-		<img alt="LINK icon" class="dark:invert-0 invert w-12" src="/link.svg" />
-		<h1 class="font-bold text-6xl">LINK</h1>
-	</div>
+		<div class="mx-auto w-full justify-center flex mt-8 opacity-90">
+			<img alt="LINK icon" class="dark:invert-0 invert w-12" src="/link.svg" />
+			<h1 class="font-bold text-6xl">LINK</h1>
+		</div>
 </div>
 
 <div
@@ -67,10 +67,14 @@
 
 				<div class="w-full mt-4 mb-10 flex justify-center">
 					{#await data.dataPromise}
-						<p class="cursor-wait opacity-60">
-							<span class="text-stone-800">Document:</span>
-							<span class="font-semibold">{presetName} ▾</span>
-						</p>
+						<div class="relative items-center border-inherit flex">
+							<p
+								class="cursor-wait opacity-60 border-inherit w-full px-5 hover:underline rounded-full text-center {button.stone}"
+							>
+								<span class="text-stone-800 dark:text-stone-300">Document:</span>
+								<span class="font-semibold">{presetName} ▾</span>
+							</p>
+						</div>
 					{:then loadedData}
 						<DocumentSelect {profile} documents={loadedData.documents} />
 					{/await}
@@ -80,9 +84,9 @@
 					<a
 						title="Go to Tutorial"
 						href="/home/tutorial"
-						class="w-full border-2 items-center px-3 flex text-xl justify-between font-semibold max-w-80 py-1 rounded-lg {button.stone} {button.stoneHover}"
+						class="w-full border-2 group items-center px-3 flex text-xl justify-between font-semibold max-w-80 py-1 rounded-lg {button.stone} {button.stoneHover}"
 					>
-						<span>How it works</span>
+						<span class="group-hover:underline">How it works</span>
 						<span>→</span>
 					</a>
 				</div>
@@ -98,6 +102,11 @@
 						loadedData.locationTree.completion.reviewComplete >
 					0}
 				{#if started}
+				<div
+					class="max-w-2xl bg-stone-300/50 dark:bg-stone-950/40 rounded-xl p-4 pb-5 px-8 shadow {shadow.color} mt-20 mx-auto"
+					transition:fly|global={{ y: 15 }}
+				>
+					<h3 class="font-medium text-lg">Translated Segments</h3>
 					<div
 						class="max-w-2xl bg-stone-300/50 dark:bg-stone-900/50 rounded-xl p-4 px-8 shadow {shadow.color} mt-20 mx-auto"
 						transition:fly={{ y: 15 }}
@@ -123,20 +132,20 @@
 							{/each}
 						</div>
 
-						<h3 class="font-medium text-lg">Reviewed Segments</h3>
-						<div
-							class="border-0 mb-5 shadow-inner z-10 rounded-lg max-h-30 overflow-auto {shadow.soft}"
-						>
-							{#each Object.entries(loadedData.segmentMap).filter(([_id, v]) => v.translationReview != null) as [id, v]}
-								{@const slug = getSegmentSlug(+id, loadedData.locationTree, '/home')}
-								<a
-									class="px-2 flex text-sky-800 dark:text-sky-500 z-0 hover:underline border-b border-stone-400 hover:bg-stone-100 active:bg-stone-300"
-									href={slug}
-								>
-									<span>{v.originalSegment.segment}</span>
-								</a>
-							{/each}
-						</div>
+					<h3 class="font-medium text-lg">Reviewed Segments</h3>
+					<div
+						class="border-0 mb-5 shadow-inner z-10 rounded-lg max-h-30 overflow-auto {shadow.soft}"
+					>
+						{#each Object.entries(loadedData.segmentMap).filter(([_id, v]) => v.translationReview != null) as [id, v]}
+							{@const slug = getSegmentSlug(+id, loadedData.locationTree, '/home')}
+							<a
+								class="px-2 flex text-sky-800 dark:text-sky-400/80 z-0 hover:underline border-b active:opacity-60 border-stone-400 hover:bg-stone-100 dark:border-stone-700/70 dark:hover:bg-stone-700 dark:hover:text-sky-400"
+								href={slug}
+							>
+								<span>{v.originalSegment.segment}</span>
+							</a>
+						{/each}
+					</div>
 
 						<h3 class="font-medium text-lg">Explore</h3>
 						<div class="grid gap-2 sm:grid-cols-2">

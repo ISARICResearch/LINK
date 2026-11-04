@@ -18,7 +18,7 @@
 	const _buttonStyle =
 		'h-7 flex justify-left cursor-pointer hover:bg-white dark:hover:bg-stone-800 rounded-md opacity-70 hover:opacity-100';
 
-	const textStyle = ' min-h-7 flex bg-stone-50 p-0.5 px-2 dark:bg-stone-800 rounded-md ';
+	const textStyle = ' min-h-7 flex bg-stone-50 p-0.5 px-2 dark:bg-stone-700 rounded-md ';
 	const completeStyle = ' min-h-7 flex bg-stone-200 p-0.5 px-2 dark:bg-stone-950 rounded-md ';
 
 	// Handle clicks outside the menu
@@ -95,7 +95,7 @@
 		<div
 			transition:fly={{ x: 15, duration: 75 }}
 			class="flex z-10 flex-col font-semibold text-sm overflow-hidden border shadow w-100 h-auto absolute -translate-x-94 -translate-y-1.5 rounded-lg
-            dark:bg-stone-950 dark:border-stone-600 bg-stone-200 border-stone-700 {shadow.color}"
+            dark:bg-stone-900 dark:border-stone-500 bg-stone-200 border-stone-700 {shadow.color}"
 		>
 			<div class=" p-1 flex flex-col">
 				{#if !interactable && (captured == '' || !captured) }

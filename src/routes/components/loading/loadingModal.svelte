@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { loading } from './loadingState.svelte';
+	import { shadow } from '$lib/styles';
 </script>
 
 <div
 	transition:fly={{ x: 10, duration: 100 }}
 	class="flex z-20 top-4 w-60 right-10 fixed border p-1 font-semibold shadow h-auto rounded-full cursor-progress text-lg
-            dark:bg-stone-950 dark:border-stone-600 bg-stone-200 border-stone-700 dark:shadow-black shadow-stone-400"
+            dark:bg-stone-900 dark:border-stone-600 bg-stone-200 border-stone-700 {shadow.color}"
 >
 	<svg
 		xmlns="http://www.w3.org/2000/svg"

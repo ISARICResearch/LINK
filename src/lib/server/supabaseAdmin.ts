@@ -1,8 +1,8 @@
-import { NEW_SEGMENTS_SUPABASE_KEY, VITE_SUPABASE_URL } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 import { createClient } from "@supabase/supabase-js";
 
 export const supabaseAdmin = createClient(
-  VITE_SUPABASE_URL,
-  NEW_SEGMENTS_SUPABASE_KEY,
+  env.VITE_SUPABASE_URL,
+  env.NEW_SEGMENTS_SUPABASE_KEY,
   { auth: { persistSession: false, autoRefreshToken: false } }
 );

@@ -1,3 +1,4 @@
+import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
 import { Amplify } from 'aws-amplify';
 
 console.log("AMPLIFY");
@@ -5,8 +6,8 @@ console.log("AMPLIFY");
 Amplify.configure({
 	Auth: {
 		Cognito: {
-			userPoolId: 'eu-west-2_B7drQDHTU',
-			userPoolClientId: '7hq3co9kq52rgglklohvdjac6f',
+			userPoolId: PUBLIC_USER_POOL_ID,
+			userPoolClientId: PUBLIC_USER_POOL_CLIENT_ID,
 			loginWith: {
 				oauth: {
 					domain: 'eu-west-2b7drqdhtu.auth.eu-west-2.amazoncognito.com',

@@ -1,19 +1,23 @@
 import { json } from '@sveltejs/kit';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
 
 const idVerifier = CognitoJwtVerifier.create({
-	userPoolId: 'eu-west-2_B7drQDHTU',
-	clientId: '7hq3co9kq52rgglklohvdjac6f',
+	userPoolId: PUBLIC_USER_POOL_ID,
+	clientId: PUBLIC_USER_POOL_CLIENT_ID,
 	tokenUse: 'id'
 });
 const accessVerifier = CognitoJwtVerifier.create({
-	userPoolId: 'eu-west-2_B7drQDHTU',
-	clientId: '7hq3co9kq52rgglklohvdjac6f',
+	userPoolId: PUBLIC_USER_POOL_ID,
+	clientId: PUBLIC_USER_POOL_CLIENT_ID,
 	tokenUse: 'access'
 });
 
 export async function POST({ request }) {
+	if (!supabaseAdmin) if (!supabaseAdmin) return json({ profile: null });
+	const client = supabaseAdmin as unknown as SupabaseClient;
 	console.log('api update profile');
 	let id, access, language, profession;
 	try {
@@ -31,7 +35,7 @@ export async function POST({ request }) {
 	if (id.email_verified !== true || typeof id.email !== 'string')
 		return json({ error: 'email not verified' }, { status: 403 });
 
-	const { error } = await supabaseAdmin.rpc('update_profile', {
+	const { error } = await client.rpc('update_profile', {
 		u_sub: id.sub,
 		u_lang: language,
 		u_prof: profession

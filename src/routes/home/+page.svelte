@@ -159,6 +159,6 @@
 		>
 			<span>Please complete your profile.</span>
 		</h3>
-		<ProfileEditor {profile} />
+		<ProfileEditor />
 	{/if}
 </div>

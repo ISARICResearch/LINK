@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
 
 const idVerifier = CognitoJwtVerifier.create({
@@ -16,9 +15,6 @@ const accessVerifier = CognitoJwtVerifier.create({
 });
 
 export async function POST({ request }) {
-	if (!supabaseAdmin) if (!supabaseAdmin) return json({ profile: null });
-	const client = supabaseAdmin as unknown as SupabaseClient;
-
 	console.log('api linkprofile');
 	let id, access;
 	try {
@@ -36,7 +32,7 @@ export async function POST({ request }) {
 		return json({ error: 'email not verified' }, { status: 403 });
 	}
 
-	const { data, error } = await client.rpc('link_profile', {
+	const { data, error } = await supabaseAdmin.rpc('link_profile', {
 		p_sub: id.sub,
 		p_email: id.email
 	});

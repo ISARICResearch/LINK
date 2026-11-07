@@ -1,33 +1,31 @@
 <script lang="ts">
 	import { button, form_element, shadow } from '$lib/styles';
-	import type { Profile } from '$lib/types';
 	import { onMount } from 'svelte';
 	import { supabase } from '../../supabaseClient';
 	import { capitalizeFirstLetter } from '$lib/utils/utils';
 	import { fetchAuthSession } from 'aws-amplify/auth';
 	import { invalidateAll } from '$app/navigation';
+	import { globalVariables } from '../home/global.svelte';
 
-	let {
-		profile
-	}: {
-		profile: Profile | null;
-	} = $props();
+	let profile = $derived(globalVariables.profile);
 
 	type ProfileSettings = {
 		language: string | null;
 		profession: string | null;
 	};
 
-	const editedProfile: ProfileSettings = $derived(
-		profile != null
-			? { language: profile.language, profession: profile.profession }
-			: { language: null, profession: null }
-	);
+	const editedProfile: ProfileSettings = $state({ language: null, profession: null });
 	let languages: string[] = $state([]);
 
 	onMount(async () => {
+		// Set profile editable variables
+		if (profile) {
+			editedProfile.language = profile.language;
+			editedProfile.profession = profile.profession;
+		}
+		// Get languages
 		const { data, error } = await supabase.from('languages').select('id');
-		console.log(data);
+		console.log('languages', data);
 		if (error) console.error('Error pulling languages');
 		languages = data ? data.map((r) => r.id) : [];
 	});
@@ -84,8 +82,6 @@
 				{#each languages as language}
 					<option value={language}>{capitalizeFirstLetter(language)}</option>
 				{/each}
-				<option value="test">{capitalizeFirstLetter('test')}</option>
-				<option value="spanish">{capitalizeFirstLetter('spanish')}</option>
 			</select>
 		</label>
 

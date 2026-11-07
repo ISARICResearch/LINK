@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { button } from '$lib/styles';
-	import { fetchAuthSession, signInWithRedirect, signOut } from 'aws-amplify/auth';
+	import { fetchAuthSession, signInWithRedirect } from 'aws-amplify/auth';
 	import ThemeManager from './components/themeManager.svelte';
 	import { goto } from '$app/navigation';
-	import { supabase } from '../supabaseClient';
-
+	
 	const _buttonStyle =
 		'w-full max-w-80 text-xl m-auto block text-center rounded-xl cursor-pointer mb-2 p-0.5 border-2 hover:bg-stone-50 border-stone-500 dark:hover:bg-stone-900 dark:hover:border-stone-300 hover:border-stone-600';
 </script>

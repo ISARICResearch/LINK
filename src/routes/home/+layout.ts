@@ -11,7 +11,7 @@ import type {
 import { pullOriginalRowsById, pullRowsForOriginalId } from '$lib/supabase/utils';
 import { supabase } from '../../supabaseClient';
 import { loading } from '../components/loading/loadingState.svelte';
-import { setDocument, setLanguage } from './global.svelte';
+import { setDocument, setLanguage, setProfile } from './global.svelte';
 import { getCurrentUser } from 'aws-amplify/auth';
 
 export const ssr = false;
@@ -35,8 +35,9 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 	depends('app:data');
 
 	if (!profile) return { profile: null, document: null, dataPromise: null };
-	if (!profile.language ) return { profile, document: null, dataPromise: null };
+	if (!profile.language) return { profile, document: null, dataPromise: null };
 
+	setProfile(profile);
 	setLanguage(profile.language);
 	setDocument(profile.selected_preset);
 

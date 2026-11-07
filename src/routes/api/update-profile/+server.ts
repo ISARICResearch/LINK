@@ -16,8 +16,6 @@ const accessVerifier = CognitoJwtVerifier.create({
 });
 
 export async function POST({ request }) {
-	if (!supabaseAdmin) if (!supabaseAdmin) return json({ profile: null });
-	const client = supabaseAdmin as unknown as SupabaseClient;
 	console.log('api update profile');
 	let id, access, language, profession;
 	try {
@@ -35,7 +33,7 @@ export async function POST({ request }) {
 	if (id.email_verified !== true || typeof id.email !== 'string')
 		return json({ error: 'email not verified' }, { status: 403 });
 
-	const { error } = await client.rpc('update_profile', {
+	const { error } = await supabaseAdmin.rpc('update_profile', {
 		u_sub: id.sub,
 		u_lang: language,
 		u_prof: profession

@@ -5,5 +5,4 @@ export const variables = defineEnvVars({
 	VITE_SUPABASE_URL: {},
 	PUBLIC_USER_POOL_ID:{},
 	PUBLIC_USER_POOL_CLIENT_ID:{},
-	
 });

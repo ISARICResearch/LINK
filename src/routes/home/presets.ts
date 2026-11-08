@@ -1,4 +1,5 @@
 import { invalidateAll } from "$app/navigation";
+import { supabase } from "../../supabaseClient";
 
 export async function handlePresetChange(preset: undefined | string) {
 	// Change this user's preset

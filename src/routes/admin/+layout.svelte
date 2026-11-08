@@ -5,7 +5,6 @@
 	import { scale } from 'svelte/transition';
 	import KabobMenu from '../components/kabobMenu.svelte';
 	import { checkAdminStatus } from '$lib/supabase/auth';
-
 	let { children } = $props();
 
 	let session: AuthSession | null = $state(null);

@@ -4,12 +4,12 @@
 	import { goto } from '$app/navigation';
 	import { exportToZip, exportToGit } from './controls/export/export';
 	import { AddArcVersionToLink } from './controls/githubToSupabaseNew';
-	import { getArcVersions } from './controls/getArcVersions';
 	import { repairLink } from '$lib/utils/repairTranslations';
 	import { pullLink, type LinkTranslation } from '$lib/utils/pullLink';
 	import type { Database } from '$lib/supabase/database.types';
-	import { supabase } from '../../supabaseClient';
 	import { onMount } from 'svelte';
+	import { supabase } from '../../supabaseClient';
+	import { getArcVersions } from './controls/getArcVersions';
 
 	//import { update_link_from_arc } from '$lib/actions/update-link-from-arc';
 	let arcVersions: Promise<Record<string, string[]>> = $state(getArcVersions());

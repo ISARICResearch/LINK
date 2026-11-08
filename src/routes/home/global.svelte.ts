@@ -1,15 +1,24 @@
-import type { TranslationLanguage } from '$lib/types';
+import type { Profile } from '$lib/types';
 
-export type GloabalVariables = {
-	language: TranslationLanguage;
+export type GlobalVariables = {
+	language: string;
 	document: string;
+	profile: Profile | null;
 };
-export const globalVariables: GloabalVariables = $state({ language: 'spanish', document: '' });
+export const globalVariables: GlobalVariables = $state({
+	language: '',
+	document: '',
+	profile: null
+});
 
-export const setLanguage = (l: TranslationLanguage) => {
+export const setLanguage = (l: string) => {
 	globalVariables.language = l;
 };
 
 export const setDocument = (d: string) => {
 	globalVariables.document = d;
+};
+
+export const setProfile = (p: Profile) => {
+	globalVariables.profile = p;
 };

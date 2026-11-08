@@ -8,17 +8,7 @@ export type AvailableLanguage = 'none' | 'spanish' | 'french' | 'portuguese';
 // List of languages that are used in both front end and the ARC-Translations repo
 export type GithubLanguage = 'English' | 'Spanish' | 'French' | 'Portuguese';
 
-// List of languages that can be translated into
-export type TranslationLanguage = 'spanish' | 'french' | 'portuguese';
-
-export type Profile = {
-	clinical_expertise: boolean;
-	created_at: string;
-	id: string;
-	is_admin: boolean;
-	language: AvailableLanguage;
-	name: string;
-};
+export type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export type FindSimilarSegmentsResult =
 	Database['public']['Functions']['find_similar_segments']['Returns'];

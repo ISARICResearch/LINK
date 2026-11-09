@@ -7,7 +7,7 @@ import { overrideClient } from '../../supabaseClient';
 
 // Runs once arc-translations:main gets an update (not from this)
 export const bring_new_arc_version_into_link = async () => {
-	console.log('=== SUPABASE ADMIN ===');
+	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ===');
 	overrideClient(supabaseAdmin);
 	const arcVersions = await getArcVersions();
 	const newestVersion = Object.keys(arcVersions).reverse()[0];
@@ -19,7 +19,7 @@ export const bring_new_arc_version_into_link = async () => {
 
 // Runs once every friday
 export const export_link_results_to_arc = async () => {
-	console.log('=== SUPABASE ADMIN ===');
+	if (supabaseAdmin) console.log('=== SUPABASE ADMIN ===');
 	overrideClient(supabaseAdmin);
 	const arcVersions = await getArcVersions();
 	const newestVersion = Object.keys(arcVersions).reverse()[0];

@@ -6,7 +6,7 @@
 		TranslationReviewRow
 	} from '$lib/supabase/types';
 	import { onMount } from 'svelte';
-	import type { Profile } from '$lib/types';
+	import type { Profile, TranslationLanguage } from '$lib/types';
 	import { button } from '$lib/styles';
 	import ReviewSegment from './reviewSegment.svelte';
 	import {
@@ -82,13 +82,13 @@
 		// pull related translations
 		relatedTranslations = await getRelatedTranslations(
 			Object.keys(segmentMap).map(Number),
-			profile.language
+			profile.language as TranslationLanguage
 		);
 		initializeCommentsToPush();
 		// pull other reviews for these segments
 		relatedReviews = await getRelatedReviews(
 			Object.keys(segmentMap).map(Number),
-			profile.language
+			profile.language as TranslationLanguage
 		);
 	});
 
@@ -177,7 +177,7 @@
 				// pull related translations
 				relatedTranslations = await getRelatedTranslations(
 					Object.keys(segmentMap).map(Number),
-					profile.language
+					profile.language as TranslationLanguage
 				);
 			}
 			saving = false;

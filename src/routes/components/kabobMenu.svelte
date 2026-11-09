@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { signOut } from 'aws-amplify/auth';
+	import { supabase } from '../../supabaseClient';
 
 	let menuContainer: HTMLDivElement;
 	let menuOpen = $state(false);
@@ -70,7 +70,7 @@
 					class={buttonStyle}
 					title="Logout"
 					onclick={() => {
-						signOut();
+						supabase.auth.signOut();
 					}}
 				>
 					<img class="dark:invert w-9 p-1" alt="Menu" src="/interaction/logout.svg" />

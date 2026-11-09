@@ -1,32 +1,38 @@
+import '$lib/amplify';
 import type { DocumentRow } from '$lib/supabase/types';
+import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
+import type { Profile } from '$lib/types';
 
-export const load: LayoutLoad = async () => {
-	const session = (await supabase.auth.getSession()).data.session;
-	if (!session) {
-		return {
-			session: null,
-			profile: null,
-			document: null
-		};
-	}
+export const ssr = false;
 
-	const { data: profile } = await supabase
-		.from('profiles')
-		.select('*')
-		.eq('id', session.user.id)
-		.single();
-		
-	if (!profile) {
-		await supabase.auth.signOut();
-		return {
-			session: session,
-			profile: null,
-			document: null
-		};
-	}
+const failed = { profile: null, document: null };
 
+const attemptLinkProfile = async () => {
+	console.log('server link-profile');
+	const { tokens } = await fetchAuthSession();
+	const idToken = tokens?.idToken?.toString();
+	const accessToken = tokens?.accessToken?.toString();
+
+	if (!idToken || !accessToken) throw new Error('not signed in');
+
+	const res = await fetch('/api/link-profile', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ idToken, accessToken })
+	});
+
+	console.log('link-profile res', res);
+	if (!res.ok) return null;
+
+	const { data: profile, error } = await supabase.rpc('retrieve_profile');
+	if (error) console.error(error);
+	if (profile?.id) return profile;
+	return null;
+};
+
+const getDocument = async (profile: Profile) => {
 	const selectedDocument = profile.selected_preset;
 	console.log('selectedDocument:', selectedDocument);
 	let document: DocumentRow | null = null;
@@ -41,11 +47,11 @@ export const load: LayoutLoad = async () => {
 			.limit(1)
 			.single();
 
-		if (myDocumentRow) 
-			document = myDocumentRow.data;
-	} // * if I don't have one, get default document
+		if (myDocumentRow) document = myDocumentRow.data;
+	}
+	// * if I don't have one, get default document
 	else {
-		console.log("no document yet")
+		console.log('no document yet');
 		const defaultDocumentRow = await supabase
 			.from('documents')
 			.select('*')
@@ -56,28 +62,47 @@ export const load: LayoutLoad = async () => {
 
 		if (defaultDocumentRow.data) document = defaultDocumentRow.data;
 	}
-
 	// * if still failed to get a document, get the first one it can find.
 	if (document == null) {
 		const defaultDocumentRow = await supabase.from('documents').select('*').limit(1).single();
 		if (defaultDocumentRow.data) document = defaultDocumentRow.data;
 	}
 
-	return {
-		session,
-		profile,
-		document
-	};
+	return document;
 };
 
-/*
+export const load: LayoutLoad = async () => {
+	console.log('Root Layout Loading...');
 
-Next steps:
-1. get and store all locations on layout load - location tree?
-2. If at a location with at least one thing in it, show the form to submit instead.
-3. On submit form, simply add items to forward tree.
+	// Check is signed in.
+	const { tokens } = await fetchAuthSession();
 
-4. Get UI from past stuff, get it pretty
-5. Load stuff stategically, maybe only original items on load, pulling in then progress, forward translations, reviews, and backward translations.
+	console.log('Root Tokens ', tokens);
 
-*/
+	if (!tokens?.accessToken) return failed;
+
+	const { data: profile, error } = await supabase.rpc('retrieve_profile');
+
+	if (error) console.error(error);
+	if (profile?.id) {
+		console.log('LOGIN: Signing in with existing profile', profile);
+		const document = await getDocument(profile);
+		return {
+			profile,
+			document
+		};
+	}
+	if (!profile?.id) {
+		const linked_profile = await attemptLinkProfile();
+		if (linked_profile?.id) {
+			console.log('LOGIN: Signing in with newly linked profile', linked_profile);
+			const document = await getDocument(linked_profile);
+			return {
+				profile: linked_profile,
+				document
+			};
+		}
+	}
+	console.log('LOGIN: Signing in without existing profile');
+	return failed;
+};

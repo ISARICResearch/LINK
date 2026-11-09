@@ -335,9 +335,9 @@ enabled = false
 
 # Use AWS Cognito (Amplify) as a third-party provider alongside Supabase Auth.
 [auth.third_party.aws_cognito]
-enabled = false
-# user_pool_id = "my-user-pool-id"
-# user_pool_region = "us-east-1"
+enabled = true
+user_pool_id = "eu-west-2_B7drQDHTU"
+user_pool_region = "eu-west-2"
 
 # Use Clerk as a third-party provider alongside Supabase Auth.
 [auth.third_party.clerk]

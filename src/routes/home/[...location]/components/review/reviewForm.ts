@@ -15,13 +15,13 @@ import {
 	InsertTranslationReviews,
 	pullRowsForOriginalId
 } from '$lib/supabase/utils';
-import type { Profile, TranslationLanguage } from '$lib/types';
+import type { Profile } from '$lib/types';
 import { loading } from '../../../../components/loading/loadingState.svelte';
 
 // Get and map related translations
 export async function getRelatedTranslations(
 	original_ids: number[],
-	language: TranslationLanguage
+	language: string
 ): Promise<RelatedTranslations> {
 	const relatedTranslations: RelatedTranslations = {};
 	const RelatedTranslationsList: ForwardTranslationRow[] = await pullRowsForOriginalId(
@@ -169,7 +169,7 @@ export async function handleSubmit(
 			newReviews.push({
 				original_id: +id,
 				reviewer_id: profile.id,
-				language: profile.language as TranslationLanguage,
+				language: profile.language,
 				translation_id: cleanedReviews[id].translation_id,
 				comments: cleanedReviews[id].comments
 			});
@@ -179,14 +179,14 @@ export async function handleSubmit(
 			newReviews.push({
 				original_id: +id,
 				reviewer_id: profile.id,
-				language: profile.language as TranslationLanguage,
+				language: profile.language,
 				translation_id: null,
 				comments: cleanedReviews[id].comments
 			});
 			newTranslations.push({
 				original_id: Number(id),
 				user_id: profile.id,
-				language: profile.language as TranslationLanguage,
+				language: profile.language,
 				translation: cleanedReviews[id].ftranslation ?? '',
 				comment: cleanedReviews[id].fcomment ?? '',
 				skipped: false
@@ -213,7 +213,7 @@ export async function handleSubmit(
 	const ids_changed: number[] = newReviews.map((r) => r.original_id);
 
 	if (newReviews.length > 0)
-		await UpdatePATOnSubmission(ids_changed, profile.language as TranslationLanguage, 'review');
+		await UpdatePATOnSubmission(ids_changed, profile.language, 'review');
 
 	// Update progress and reset app
 	if (newTranslations.length > 0 || newReviews.length > 0) {
@@ -228,7 +228,7 @@ export async function handleSubmit(
 
 export async function getRelatedReviews(
 	original_ids: number[],
-	language: TranslationLanguage
+	language: string
 ): Promise<Record<number, TranslationReviewRow[]>> {
 	const relatedReviews: Record<number, TranslationReviewRow[]> = {};
 	const RelatedReviewsList: TranslationReviewRow[] = await pullRowsForOriginalId(
@@ -250,7 +250,7 @@ export async function getRelatedReviews(
 
 export async function getRelatedInformation(
 	original_ids: number[],
-	language: TranslationLanguage
+	language: string
 ): Promise<RelatedTranslations> {
 	const relatedTranslations: RelatedTranslations = {};
 	const RelatedTranslationsList: ForwardTranslationRow[] = await pullRowsForOriginalId(

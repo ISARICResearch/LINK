@@ -32,7 +32,7 @@ export async function POST({ request }) {
 	if (id.email_verified !== true || typeof id.email !== 'string')
 		return json({ error: 'email not verified' }, { status: 403 });
 
-	const { error } = await supabaseAdmin.rpc('update_profile', {
+	const { error } = await supabaseAdmin().rpc('update_profile', {
 		u_sub: id.sub,
 		u_lang: language,
 		u_prof: profession

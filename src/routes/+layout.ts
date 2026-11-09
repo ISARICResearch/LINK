@@ -4,6 +4,8 @@ import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
 import type { Profile } from '$lib/types';
+import { withTimeout } from '$lib/utils/utils';
+import { signOut } from 'aws-amplify/auth';
 
 export const ssr = false;
 
@@ -75,11 +77,16 @@ export const load: LayoutLoad = async () => {
 	console.log('Root Layout Loading...');
 
 	// Check is signed in.
-	const { tokens } = await fetchAuthSession();
 
-	console.log('Root Tokens ', tokens);
-
-	if (!tokens?.accessToken) return failed;
+	try {
+		const { tokens } = await withTimeout(fetchAuthSession(), 1000);
+		console.log('Root Tokens ', tokens);
+		if (!tokens) return failed;
+	} catch (error) {
+		console.error('Auth session failed, resetting local auth state', error);
+		await withTimeout(signOut({ global: false }), 2000);
+		return failed;
+	}
 
 	const { data: profile, error } = await supabase.rpc('retrieve_profile');
 

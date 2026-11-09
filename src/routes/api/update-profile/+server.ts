@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
 
 const idVerifier = CognitoJwtVerifier.create({

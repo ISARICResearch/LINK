@@ -16,7 +16,7 @@
 	</div>
 
 	<!-- Main content -->
-	<main class="min-h-[90vh] grow">
+	<main class=" grow">
 		{@render children()}
 	</main>
 

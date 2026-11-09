@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { signOut } from 'aws-amplify/auth';
+	import ProfileEditor from './profileEditor.svelte';
 
 	let menuContainer: HTMLDivElement;
 	let menuOpen = $state(false);
+	let profileEditorOpen = $state(false);
 	let isDark = $state(document.documentElement.classList.contains('dark'));
 
 	const buttonStyle =
@@ -19,6 +21,11 @@
 	// Add/remove event listener when menu opens/closes
 	$effect(() => {
 		if (menuOpen) {
+			// Add listener on next tick to avoid immediate closure
+			setTimeout(() => {
+				document.addEventListener('click', handleClickOutside);
+			}, 0);
+		} else if (profileEditorOpen) {
 			// Add listener on next tick to avoid immediate closure
 			setTimeout(() => {
 				document.addEventListener('click', handleClickOutside);
@@ -66,6 +73,30 @@
 
 					<div class="h-full pt-1">{isDark ? 'Light Theme' : 'Dark Theme'}</div>
 				</button>
+				<!--
+				<button
+					class={buttonStyle}
+					title="Settings"
+					onclick={() => {
+						profileEditorOpen = !profileEditorOpen;
+					}}
+				>
+					<img class="dark:invert w-9 p-1" alt="Menu" src="/interaction/gear.svg" />
+					<div class="h-full pt-1">Settings</div>
+				</button>-->
+
+				<a
+					class={buttonStyle}
+					href="https://account.isaric.org/"
+					target="_blank"
+					title="ISARIC Accounts"
+				>
+					<img class="dark:invert w-9 p-1" alt="Menu" src="/interaction/person.svg" />
+					<div class="h-full pt-1">ISARIC Account</div>
+				</a>
+			</div>
+
+			<div class=" p-1 space-y-0.5 flex border-t border-inherit flex-col">
 				<button
 					class={buttonStyle}
 					title="Logout"
@@ -77,13 +108,12 @@
 					<div class="h-full pt-1">Logout</div>
 				</button>
 			</div>
-			<!--
-			<div class=" p-1 space-y-0.5 flex flex-col">
-				<select class="{buttonStyle} pl-2"
-					>CRF: <option>Dengue</option><option>All Questions</option><option>All Questions</option
-					></select
-				>
-			</div>-->
 		</div>
+
+		{#if profileEditorOpen}
+			<div transition:fly={{ x: 15, duration: 75 }} class="flex absolute">
+				<ProfileEditor />
+			</div>
+		{/if}
 	{/if}
 </div>

@@ -3,7 +3,9 @@
 
 	import ProfileEditor from './profileEditor.svelte';
 
-	import { trySignOut } from '$lib/auth';
+	//import { trySignOut } from '$lib/auth';
+	import { supabase } from '../../supabaseClient';
+	import { invalidateAll } from '$app/navigation';
 
 	let menuContainer: HTMLDivElement;
 	let menuOpen = $state(false);
@@ -103,7 +105,9 @@
 					class={buttonStyle}
 					title="Logout"
 					onclick={async () => {
-						await trySignOut();
+						//await trySignOut();
+						await supabase.auth.signOut();
+						await invalidateAll();
 					}}
 				>
 					<img class="dark:invert w-9 p-1" alt="Menu" src="/interaction/logout.svg" />

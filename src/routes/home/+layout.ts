@@ -1,6 +1,8 @@
-import '$lib/amplify';
 import { buildLocationTree, computeCompletion, type LocationNode } from '$lib/utils/locationTree';
+//import { createSlugMapping } from '$lib/utils/slug';
 import type { LayoutLoad } from './$types';
+//import { redirect } from '@sveltejs/kit';
+
 import type {
 	DocumentRow,
 	ForwardTranslationRow,
@@ -10,50 +12,55 @@ import type {
 } from '$lib/supabase/types';
 import { pullOriginalRowsById, pullRowsForOriginalId } from '$lib/supabase/utils';
 import { supabase } from '../../supabaseClient';
+import { redirect } from '@sveltejs/kit';
 import { loading } from '../components/loading/loadingState.svelte';
-import { setDocument, setLanguage, setProfile } from './global.svelte';
-import { getCurrentUser } from 'aws-amplify/auth';
-import { withTimeout } from '$lib/utils/utils';
-import { trySignOut } from '$lib/auth';
+import { setDocument, setLanguage } from './global.svelte';
 
-export const ssr = false;
+export const ssr = false; // Force client-side for authentication
+
+const timeStamps: number[] = [];
+
+// & print time since last call + a message
+const printTime = (message: string = '') => {
+	timeStamps.push(performance.now());
+	const A = timeStamps.at(-1);
+	const B = timeStamps.at(-2);
+	if (A && B) console.log(message + ' - ' + String(A - B));
+	else if (message != '') console.log(message);
+};
 
 // == on load home page or children == //
 export const load: LayoutLoad = async ({ parent, depends }) => {
 	loading.message = 'Getting document...';
 	loading.active = true;
+	printTime();
 
-	console.time('/home/ check user');
-	console.log('home, Check user is signed in...');
-	try {
-		const { username, userId, signInDetails } = await withTimeout(getCurrentUser());
-		console.log('home, Check user is signed in RESULT:', username, userId, signInDetails);
-	} catch (error) {
-		console.error('Auth session failed, resetting local auth state', error);
-		await trySignOut();
-		// AIDAN COME HERE
-		// If it fails, check this.
+	const { session, profile, document } = await parent();
+
+	printTime('loaded session, profile, document');
+
+	// ! catch not logged in
+	if (!session || !profile) {
+		console.warn(session, profile);
+		if (!profile && session) await supabase.auth.signOut();
+		redirect(302, '/login');
 	}
 
-	console.time('/home/ handle profile');
-	const { profile, document } = await parent();
-	console.timeEnd('/home/ handle profile');
-
-	loading.active = false;
+	if (!profile.language) {
+		console.warn('No language set');
+		if (!profile && session) await supabase.auth.signOut();
+		redirect(302, '/login');
+	}
 
 	depends('app:data');
-
-	if (!profile) return { profile: null, document: null, dataPromise: null };
-	if (!profile.language) return { profile, document: null, dataPromise: null };
-
-	setProfile(profile);
 	setLanguage(profile.language);
 	setDocument(profile.selected_preset);
 
+	loading.active = false;
 	return {
 		profile,
 		document,
-		dataPromise: loadDataProgressively(profile.id, profile.language, document)
+		dataPromise: loadDataProgressively(session.user.id, profile.language, document)
 	};
 };
 
@@ -62,7 +69,6 @@ async function loadDataProgressively(
 	language: string,
 	document: DocumentRow | null
 ) {
-	console.time('/home/ pulling data');
 	loading.message = 'Pulling segments...';
 	loading.active = true;
 	const segmentMap: SegmentMap = {};
@@ -92,8 +98,7 @@ async function loadDataProgressively(
 		),
 		await supabase.from('documents').select('id, title, version')
 	]);
-	console.time('/home/ pulling data');
-	console.time('/home/ computing data');
+	printTime('pulled all data');
 
 	// = ( 2 ) = Create Segment map from original segments
 	(original_segments || []).forEach((segment) => {
@@ -150,13 +155,16 @@ async function loadDataProgressively(
 			documentMap[document.title].push(document);
 		}
 	}*/
-	console.time('/home/ computing data');
-	console.log('/home/ == complete ==');
+
+	printTime('computed node completions');
+	console.log('== complete ==');
 
 	loading.active = false;
 	return {
 		segmentMap,
 		locationTree,
+
+		//slugMapping,
 		documents
 	};
 }

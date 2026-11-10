@@ -1,12 +1,15 @@
 <script lang="ts">
-	import { shadow } from '$lib/styles';
-	import { fetchAuthSession, signInWithRedirect } from 'aws-amplify/auth';
+	import { button, shadow } from '$lib/styles';
+	//import { fetchAuthSession, signInWithRedirect } from 'aws-amplify/auth';
 	import ThemeManager from './components/themeManager.svelte';
-	import { goto } from '$app/navigation';
+	//import { goto } from '$app/navigation';
 
 	const start_style =
 		'flex max-w-80 justify-center w-full p-6 flex-col font-semibold rounded-xl  text-center bg-linear-15 from-green-800/80 to-green-400/50 shadow-lg  ' +
 		shadow.color;
+
+	const buttonStyle =
+		'w-full max-w-80 text-xl m-auto block text-center rounded-xl cursor-pointer mb-2 p-0.5 border-2 hover:bg-stone-50 border-stone-500 dark:hover:bg-stone-900 dark:hover:border-stone-300 hover:border-stone-600';
 
 	const start_interaction =
 		' cursor-pointer hover:from-green-800/80 duration-50 hover:to-green-400/90 hover:shadow-stone-500/90 dark:hover:shadow-black/90 active:opacity-70 hover:text-black dark:hover:text-white transition-all hover:opacity-100 opacity-90 ';
@@ -33,24 +36,23 @@
 <div class="w-full max-w-96 my-auto mx-auto">
 	<div class="flex-wrap border-inherit p-4">
 		<p class="font-bold text-stone-700 dark:text-stone-300 w-full text-center mt-15"></p>
-		<!--
-			<a
-				data-sveltekit-preload-code="eager"
-				class="w-full block max-w-80 m-auto text-3xl font-semibold rounded-xl border-3 cursor-pointer p-2 text-center {button
-					.green.default} {button.green.hover}"
-				href="/login"
-			>
-				Login
-			</a>
-			<p class="font-bold text-stone-700 dark:text-stone-300 w-full text-center mt-3"></p>
-			<a
-				data-sveltekit-preload-code="eager"
-				class="{button.stoneHover} {buttonStyle} text-md"
-				href="/register"
-			>
-				Create Account
-			</a>-->
+		<a
+			data-sveltekit-preload-code="eager"
+			class=" mx-auto text-4xl {start_interaction} {start_style} "
+			href="/login"
+		>
+			Login
+		</a>
+		<p class="font-bold text-stone-700 dark:text-stone-300 w-full text-center mt-3"></p>
+		<a
+			data-sveltekit-preload-code="eager"
+			class="{button.stoneHover} {buttonStyle} text-md"
+			href="/register"
+		>
+			Create Account
+		</a>
 
+		<!--
 		<button
 			onclick={async () => {
 				'Clicked: signInWithRedirect()';

@@ -4,13 +4,15 @@ import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
 import type { Profile } from '$lib/types';
-import { withTimeout } from '$lib/utils/utils';
-import { signOut } from 'aws-amplify/auth';
+//import { withTimeout } from '$lib/utils/utils';
+//import { signOut } from 'aws-amplify/auth';
+import type { AuthSession } from '@supabase/supabase-js';
 //import { trySignOut } from '$lib/auth';
 
 export const ssr = false;
 
 type PageReturn = {
+	session: AuthSession | null;
 	profile: Profile | null;
 	document: {
 		created_at: string;
@@ -20,9 +22,9 @@ type PageReturn = {
 		version: string;
 	} | null;
 };
-const failed: PageReturn = { profile: null, document: null };
+//const failed: PageReturn = { session: null, profile: null, document: null };
 
-const attemptLinkProfile = async () => {
+const _attemptLinkProfile = async () => {
 	console.log('server link-profile');
 	const { tokens } = await fetchAuthSession();
 	const idToken = tokens?.idToken?.toString();
@@ -45,7 +47,7 @@ const attemptLinkProfile = async () => {
 	return null;
 };
 
-const getDocument = async (profile: Profile) => {
+const _getDocument = async (profile: Profile) => {
 	const selectedDocument = profile.selected_preset;
 	console.log('selectedDocument:', selectedDocument);
 	let document: DocumentRow | null = null;
@@ -88,7 +90,16 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	console.log('Root Layout Loading...');
 
 	// Check is signed in.
+	const session = (await supabase.auth.getSession()).data.session;
+	if (!session) {
+		return {
+			session: null,
+			profile: null,
+			document: null
+		};
+	}
 
+	/*
 	try {
 		const { tokens } = await withTimeout(fetchAuthSession(), 8000);
 		console.log('Root Tokens ', tokens);
@@ -121,7 +132,7 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 		};
 	}
 	if (!profile?.id) {
-		const linked_profile = await attemptLinkProfile();
+		const linked_profile = await _attemptLinkProfile();
 		if (linked_profile?.id) {
 			console.log('LOGIN: Signing in with newly linked profile', linked_profile);
 			const document = await getDocument(linked_profile);
@@ -132,5 +143,64 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 		}
 	}
 	console.log('LOGIN: Signing in without existing profile');
-	return failed;
+	return failed;	
+	*/
+
+	const { data: profile } = await supabase
+		.from('profiles')
+		.select('*')
+		.eq('id', session.user.id)
+		.single();
+
+	console.log('profile', profile);
+
+	if (!profile) {
+		await supabase.auth.signOut();
+		return {
+			session: session,
+			profile: null,
+			document: null
+		};
+	}
+
+	const selectedDocument = profile.selected_preset;
+	console.log('selectedDocument:', selectedDocument);
+	let document: DocumentRow | null = null;
+
+	// * get my document
+	if (selectedDocument) {
+		const myDocumentRow = await supabase
+			.from('documents')
+			.select('*')
+			.eq('title', selectedDocument)
+			.order('created_at', { ascending: false })
+			.limit(1)
+			.single();
+
+		if (myDocumentRow) document = myDocumentRow.data;
+	} // * if I don't have one, get default document
+	else {
+		console.log('no document yet');
+		const defaultDocumentRow = await supabase
+			.from('documents')
+			.select('*')
+			.eq('title', 'ARC')
+			.order('created_at', { ascending: false })
+			.limit(1)
+			.single();
+
+		if (defaultDocumentRow.data) document = defaultDocumentRow.data;
+	}
+
+	// * if still failed to get a document, get the first one it can find.
+	if (document == null) {
+		const defaultDocumentRow = await supabase.from('documents').select('*').limit(1).single();
+		if (defaultDocumentRow.data) document = defaultDocumentRow.data;
+	}
+
+	return {
+		session,
+		profile,
+		document
+	};
 };

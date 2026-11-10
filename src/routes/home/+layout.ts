@@ -12,8 +12,9 @@ import { pullOriginalRowsById, pullRowsForOriginalId } from '$lib/supabase/utils
 import { supabase } from '../../supabaseClient';
 import { loading } from '../components/loading/loadingState.svelte';
 import { setDocument, setLanguage, setProfile } from './global.svelte';
-import { getCurrentUser, signOut } from 'aws-amplify/auth';
+import { getCurrentUser } from 'aws-amplify/auth';
 import { withTimeout } from '$lib/utils/utils';
+import { trySignOut } from '$lib/auth';
 
 export const ssr = false;
 
@@ -29,7 +30,9 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 		console.log('home, Check user is signed in RESULT:', username, userId, signInDetails);
 	} catch (error) {
 		console.error('Auth session failed, resetting local auth state', error);
-		await withTimeout(signOut({ global: false }), 1000);
+		await trySignOut();
+		// AIDAN COME HERE
+		// If it fails, check this.
 	}
 
 	console.time('/home/ handle profile');

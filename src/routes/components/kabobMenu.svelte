@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import { signOut } from 'aws-amplify/auth';
+
 	import ProfileEditor from './profileEditor.svelte';
+
+	import { trySignOut } from '$lib/auth';
 
 	let menuContainer: HTMLDivElement;
 	let menuOpen = $state(false);
@@ -100,8 +102,8 @@
 				<button
 					class={buttonStyle}
 					title="Logout"
-					onclick={() => {
-						signOut();
+					onclick={async () => {
+						await trySignOut();
 					}}
 				>
 					<img class="dark:invert w-9 p-1" alt="Menu" src="/interaction/logout.svg" />

@@ -6,10 +6,21 @@ import type { LayoutLoad } from './home/$types';
 import type { Profile } from '$lib/types';
 import { withTimeout } from '$lib/utils/utils';
 import { signOut } from 'aws-amplify/auth';
+//import { trySignOut } from '$lib/auth';
 
 export const ssr = false;
 
-const failed = { profile: null, document: null };
+type PageReturn = {
+	profile: Profile | null;
+	document: {
+		created_at: string;
+		id: number;
+		original_ids: number[];
+		title: string;
+		version: string;
+	} | null;
+};
+const failed: PageReturn = { profile: null, document: null };
 
 const attemptLinkProfile = async () => {
 	console.log('server link-profile');
@@ -73,15 +84,25 @@ const getDocument = async (profile: Profile) => {
 	return document;
 };
 
-export const load: LayoutLoad = async () => {
+export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	console.log('Root Layout Loading...');
 
 	// Check is signed in.
 
 	try {
-		const { tokens } = await withTimeout(fetchAuthSession(), 1000);
+		const { tokens } = await withTimeout(fetchAuthSession(), 8000);
 		console.log('Root Tokens ', tokens);
-		if (!tokens) return failed;
+		if (!tokens) {
+			try {
+				console.log('No token');
+				//await trySignOut();
+				console.error('Auth session failed, resetting local auth state');
+				await withTimeout(signOut({ global: false }), 2000);
+				return failed;
+			} catch {
+				return failed;
+			}
+		}
 	} catch (error) {
 		console.error('Auth session failed, resetting local auth state', error);
 		await withTimeout(signOut({ global: false }), 2000);

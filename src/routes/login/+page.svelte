@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { supabase } from '../../supabaseClient';
-	import type { AuthSession } from '@supabase/supabase-js';
+	//import type { AuthSession } from '@supabase/supabase-js';
 	import ThemeManager from '../components/themeManager.svelte';
 	import { button, card_static, form_element } from '$lib/styles';
 	import { checkAdminStatus } from '$lib/supabase/auth';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { loading } from '../components/loading/loadingState.svelte';
 
-	let session: AuthSession | null;
+	//let session: AuthSession | null;
 	let email: string = $state('');
 	let password: string = $state('');
 
@@ -19,7 +19,7 @@
 		const profile = await data.profile;
 		console.log('login loaded profile:', profile);
 		if (profile) window.location.href = '/home';
-		
+		/*
 		supabase.auth.getSession().then(({ data }) => {
 			session = data.session;
 			console.log('login loaded session:', session);
@@ -29,7 +29,7 @@
 
 		supabase.auth.onAuthStateChange((_event, _session) => {
 			session = _session;
-		});
+		});*/
 	});
 
 	async function handleSignIn(event: Event) {
@@ -50,13 +50,11 @@
 		}
 
 		// Force the auth client to settle before navigating
-		await supabase.auth.getSession();
+		//await supabase.auth.getSession();
 
 		const isAdmin = await checkAdminStatus(data.user.id);
 
 		loading.active = false;
-
-		await invalidateAll();
 
 		if (isAdmin) {
 			goto('/admin');

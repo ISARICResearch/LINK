@@ -64,9 +64,3 @@ export const generateDocumentName = (selected_preset: string) => {
 		(selected_preset == 'ARC' ? ' Database' : '')
 	);
 };
-
-export const withTimeout = <T>(p: Promise<T>, ms = 4000) =>
-  Promise.race([
-    p,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('auth timeout')), ms)),
-  ])

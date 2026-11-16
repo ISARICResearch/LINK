@@ -20,6 +20,7 @@ To get started with LINK, first we must create an account:
 
 From here, you should be automatically logged in! 
 
+
 ## Login
 To log into your existing account: 
 1. In your browser, go to https://link-mgea.vercel.app/login

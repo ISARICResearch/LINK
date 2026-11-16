@@ -19,6 +19,8 @@ jobs:
           docker build \
             --build-arg VITE_SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}" \
             --build-arg VITE_SUPABASE_ANON_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
+            --build-arg PUBLIC_USER_POOL_ID="${{ secrets.PUBLIC_USER_POOL_ID }}" \
+            --build-arg PUBLIC_USER_POOL_CLIENT_ID="${{ secrets.PUBLIC_USER_POOL_CLIENT_ID }}" \
             -t link .
 
       - name: Run Docker container

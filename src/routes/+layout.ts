@@ -1,32 +1,52 @@
+import '$lib/amplify';
 import type { DocumentRow } from '$lib/supabase/types';
+import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
+import type { Profile } from '$lib/types';
+import { withTimeout } from '$lib/utils/utils';
+import { signOut } from 'aws-amplify/auth';
+import { trySignOut } from '$lib/auth';
+//import { trySignOut } from '$lib/auth';
 
-export const load: LayoutLoad = async () => {
-	const session = (await supabase.auth.getSession()).data.session;
-	if (!session) {
-		return {
-			session: null,
-			profile: null,
-			document: null
-		};
-	}
+export const ssr = false;
 
-	const { data: profile } = await supabase
-		.from('profiles')
-		.select('*')
-		.eq('id', session.user.id)
-		.single();
-		
-	if (!profile) {
-		await supabase.auth.signOut();
-		return {
-			session: session,
-			profile: null,
-			document: null
-		};
-	}
+type PageReturn = {
+	profile: Profile | null;
+	document: {
+		created_at: string;
+		id: number;
+		original_ids: number[];
+		title: string;
+		version: string;
+	} | null;
+};
+const failed: PageReturn = { profile: null, document: null };
 
+const attemptLinkProfile = async () => {
+	console.log('server link-profile');
+	const { tokens } = await fetchAuthSession();
+	const idToken = tokens?.idToken?.toString();
+	const accessToken = tokens?.accessToken?.toString();
+
+	if (!idToken || !accessToken) throw new Error('not signed in');
+
+	const res = await fetch('/api/link-profile', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ idToken, accessToken })
+	});
+
+	console.log('link-profile res', res);
+	if (!res.ok) return null;
+
+	const { data: profile, error } = await supabase.rpc('retrieve_profile');
+	if (error) console.error(error);
+	if (profile?.id) return profile;
+	return null;
+};
+
+const getDocument = async (profile: Profile) => {
 	const selectedDocument = profile.selected_preset;
 	console.log('selectedDocument:', selectedDocument);
 	let document: DocumentRow | null = null;
@@ -41,11 +61,11 @@ export const load: LayoutLoad = async () => {
 			.limit(1)
 			.single();
 
-		if (myDocumentRow) 
-			document = myDocumentRow.data;
-	} // * if I don't have one, get default document
+		if (myDocumentRow) document = myDocumentRow.data;
+	}
+	// * if I don't have one, get default document
 	else {
-		console.log("no document yet")
+		console.log('no document yet');
 		const defaultDocumentRow = await supabase
 			.from('documents')
 			.select('*')
@@ -56,28 +76,58 @@ export const load: LayoutLoad = async () => {
 
 		if (defaultDocumentRow.data) document = defaultDocumentRow.data;
 	}
-
 	// * if still failed to get a document, get the first one it can find.
 	if (document == null) {
 		const defaultDocumentRow = await supabase.from('documents').select('*').limit(1).single();
 		if (defaultDocumentRow.data) document = defaultDocumentRow.data;
 	}
 
-	return {
-		session,
-		profile,
-		document
-	};
+	return document;
 };
 
-/*
+export const load: LayoutLoad = async (): Promise<PageReturn> => {
+	console.log('Root Layout Loading...');
+	try {
+		const { tokens } = await withTimeout(fetchAuthSession(), 8000);
+		console.log('Root Tokens ', tokens);
+		if (!tokens) {
+			try {
+				console.log('No token, not signed in.');
+				//await trySignOut();
+				await withTimeout(signOut({ global: false }), 2000);
+				return failed;
+			} catch {
+				return failed;
+			}
+		}
+	} catch (error) {
+		console.error('ROOT Auth session failed, resetting local auth state', error);
+		await  trySignOut();
+		return failed;
+	}
 
-Next steps:
-1. get and store all locations on layout load - location tree?
-2. If at a location with at least one thing in it, show the form to submit instead.
-3. On submit form, simply add items to forward tree.
+	const { data: profile, error } = await supabase.rpc('retrieve_profile');
 
-4. Get UI from past stuff, get it pretty
-5. Load stuff stategically, maybe only original items on load, pulling in then progress, forward translations, reviews, and backward translations.
-
-*/
+	if (error) console.error(error);
+	if (profile?.id) {
+		console.log('LOGIN: Signing in with existing profile', profile);
+		const document = await getDocument(profile);
+		return {
+			profile,
+			document
+		};
+	}
+	if (!profile?.id) {
+		const linked_profile = await attemptLinkProfile();
+		if (linked_profile?.id) {
+			console.log('LOGIN: Signing in with newly linked profile', linked_profile);
+			const document = await getDocument(linked_profile);
+			return {
+				profile: linked_profile,
+				document
+			};
+		}
+	}
+	console.log('LOGIN: Signing in without existing profile');
+	return failed;
+};

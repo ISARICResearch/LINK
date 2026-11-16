@@ -129,6 +129,11 @@ async function HandleNewForwardTranslations(
 
 	console.log('newSegments', newSegments.length);
 
+	const lang_res = await supabase.from('languages').select('id');
+	if (lang_res.error) throw lang_res.error;
+	if (!lang_res.data) throw 'no languages data';
+	const languages = lang_res.data.map((row) => row.id);
+
 	for (const ns of newSegments) {
 		// == Handle List Items == //
 		if (ns.type == 'listItem') {
@@ -163,13 +168,20 @@ async function HandleNewForwardTranslations(
 				continue;
 			}
 
-			for (const language in arc) {
-				if (language == 'English') continue;
-				const l = language.toLowerCase() as TranslationLanguage;
+			for (const language_arc in arc) {
+				if (language_arc == 'English') continue;
+				const l_key = language_arc.trim().toLowerCase();
+				if (!languages.includes(l_key)) {
+					const newLangRes = await supabase
+						.from('languages')
+						.upsert({ id: l_key }, { onConflict: 'id', ignoreDuplicates: true });
+					if (newLangRes.error) throw newLangRes.error;
+					languages.push(l_key);
+				}
 
-				const lists = arc[language]['Lists'];
+				const lists = arc[language_arc]['Lists'];
 				if (!lists) {
-					failedSegments.push([ns, language, 'lists missing', arc[language]]);
+					failedSegments.push([ns, language_arc, 'lists missing', arc[language_arc]]);
 					continue;
 				}
 
@@ -177,7 +189,7 @@ async function HandleNewForwardTranslations(
 				if (!csvT) {
 					failedSegments.push([
 						ns,
-						language,
+						language_arc,
 						'csv missing',
 						lists,
 						ns.location[1],
@@ -190,7 +202,7 @@ async function HandleNewForwardTranslations(
 				if (!tRow) {
 					failedSegments.push([
 						{ ns: ns },
-						language,
+						language_arc,
 						'row missing in translated csv: ',
 						index,
 						{ csvE: csvE },
@@ -202,7 +214,7 @@ async function HandleNewForwardTranslations(
 				if (!tRow[column]) {
 					failedSegments.push([
 						ns,
-						language,
+						language_arc,
 						'column missing in translated row',
 						csvT,
 						index,
@@ -215,7 +227,7 @@ async function HandleNewForwardTranslations(
 				const translation = tRow[column].trim();
 
 				const t: ForwardTranslationInsert = {
-					language: l,
+					language: l_key,
 					original_id: ns.id,
 					skipped: false,
 					translation: translation,

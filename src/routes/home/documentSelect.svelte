@@ -5,22 +5,14 @@
 	import { supabase } from '../../supabaseClient';
 	import { generateDocumentName } from '$lib/utils/utils';
 	import Info from './info.svelte';
+	import type { Profile } from '$lib/types';
 
 	let {
 		documents,
 		profile
 	}: {
 		documents: { id: number; title: string; version: string }[];
-		profile: {
-			clinical_expertise: boolean | null;
-			created_at: string;
-			id: string;
-			is_admin: boolean;
-			language: string | null;
-			name: string | null;
-			profession: string | null;
-			selected_preset: string | null;
-		};
+		profile: Profile;
 	} = $props();
 
 	async function handlePresetChange(preset: undefined | string) {

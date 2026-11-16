@@ -1,7 +1,6 @@
 # LINK
 Welcome to **LINK**, the Language Integration Network Kit!
 
-
 Proudly presented by [CONAGIO](contagio.network) and [ISARIC](isaric.org), LINK is our tool for verifying automatic machine translations of the [ARC](https://github.com/ISARICResearch/ARC) database. 
 
 Our goal is to create a system that can translate segements into any language using best-practices translation methodology. Specifically, we look to the TRAPD translation framework for methodological guidance.

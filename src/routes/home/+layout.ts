@@ -12,7 +12,9 @@ import { pullOriginalRowsById, pullRowsForOriginalId } from '$lib/supabase/utils
 import { supabase } from '../../supabaseClient';
 import { loading } from '../components/loading/loadingState.svelte';
 import { setDocument, setLanguage, setProfile } from './global.svelte';
-import { getCurrentUser } from 'aws-amplify/auth';
+import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
+import { withTimeout } from '$lib/utils/utils';
+import { trySignOut } from '$lib/auth';
 
 export const ssr = false;
 
@@ -21,16 +23,24 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 	loading.message = 'Getting document...';
 	loading.active = true;
 
-	console.time('/home/ check user');
-	console.log('home, Check user is signed in...');
-	const { username, userId, signInDetails } = await getCurrentUser();
-	console.log('home, Check user is signed in RESULT:', username, userId, signInDetails);
-
 	console.time('/home/ handle profile');
 	const { profile, document } = await parent();
 	console.timeEnd('/home/ handle profile');
 
 	loading.active = false;
+
+	console.time('/home/ check user');
+	console.log('home, Check user is signed in...');
+	
+	try {
+		const { username, userId, signInDetails } = await withTimeout(getCurrentUser());
+		console.log('home, Check user is signed in RESULT:', username, userId, signInDetails);
+	} catch (error) {
+		console.error('HOME: Auth session failed, resetting local auth state', error);
+		await trySignOut();
+		// AIDAN COME HERE
+		// If it fails, check this.
+	}
 
 	depends('app:data');
 
@@ -40,6 +50,9 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 	setProfile(profile);
 	setLanguage(profile.language);
 	setDocument(profile.selected_preset);
+
+	const { tokens } = await fetchAuthSession();
+	console.log('tokens', tokens);
 
 	return {
 		profile,

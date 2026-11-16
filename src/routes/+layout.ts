@@ -4,10 +4,24 @@ import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
 import type { Profile } from '$lib/types';
+import { withTimeout } from '$lib/utils/utils';
+import { signOut } from 'aws-amplify/auth';
+import { trySignOut } from '$lib/auth';
+//import { trySignOut } from '$lib/auth';
 
 export const ssr = false;
 
-const failed = { profile: null, document: null };
+type PageReturn = {
+	profile: Profile | null;
+	document: {
+		created_at: string;
+		id: number;
+		original_ids: number[];
+		title: string;
+		version: string;
+	} | null;
+};
+const failed: PageReturn = { profile: null, document: null };
 
 const attemptLinkProfile = async () => {
 	console.log('server link-profile');
@@ -71,15 +85,26 @@ const getDocument = async (profile: Profile) => {
 	return document;
 };
 
-export const load: LayoutLoad = async () => {
+export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	console.log('Root Layout Loading...');
-
-	// Check is signed in.
-	const { tokens } = await fetchAuthSession();
-
-	console.log('Root Tokens ', tokens);
-
-	if (!tokens?.accessToken) return failed;
+	try {
+		const { tokens } = await withTimeout(fetchAuthSession(), 8000);
+		console.log('Root Tokens ', tokens);
+		if (!tokens) {
+			try {
+				console.log('No token, not signed in.');
+				//await trySignOut();
+				await withTimeout(signOut({ global: false }), 2000);
+				return failed;
+			} catch {
+				return failed;
+			}
+		}
+	} catch (error) {
+		console.error('ROOT Auth session failed, resetting local auth state', error);
+		await  trySignOut();
+		return failed;
+	}
 
 	const { data: profile, error } = await supabase.rpc('retrieve_profile');
 

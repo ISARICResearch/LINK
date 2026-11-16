@@ -32,7 +32,7 @@ export async function POST({ request }) {
 		return json({ error: 'email not verified' }, { status: 403 });
 	}
 
-	const { data, error } = await supabaseAdmin.rpc('link_profile', {
+	const { data, error } = await supabaseAdmin().rpc('link_profile', {
 		p_sub: id.sub,
 		p_email: id.email
 	});

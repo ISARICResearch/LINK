@@ -20,4 +20,3 @@ Amplify.configure({
 		}
 	}
 });
-

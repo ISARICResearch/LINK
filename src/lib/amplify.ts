@@ -1,5 +1,6 @@
 import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
 import { Amplify } from 'aws-amplify';
+import 'aws-amplify/auth/enable-oauth-listener';
 
 console.log('AMPLIFY');
 

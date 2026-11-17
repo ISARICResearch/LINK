@@ -30,8 +30,8 @@ jobs:
       - name: Export Link Results To Arc
         run: npx tsx src/lib/server/export_link_results_to_arc.ts
         env:
-          VITE_ARC_SOURCES_READ_TOKEN: ${{ secrets.VITE_ARC_SOURCES_READ_TOKEN }}
+          PUBLIC_ARC_SOURCES_READ_TOKEN: ${{ secrets.PUBLIC_ARC_SOURCES_READ_TOKEN }}
           ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          NEW_SEGMENTS_SUPABASE_KEY: ${{ secrets.NEW_SEGMENTS_SUPABASE_KEY }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_ADMIN_KEY: ${{ secrets.SUPABASE_ADMIN_KEY }}

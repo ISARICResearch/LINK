@@ -46,7 +46,7 @@ export function sortSegmentMap(original: SegmentMap): [number, SegmentData][] {
 }
 
 // env key helper
-export const env2 = (key: string) =>
+const _env2 = (key: string) =>
 	import.meta.env?.[key] ?? (typeof process !== 'undefined' ? process.env?.[key] : undefined);
 
 export const env = (key: string): string => {
@@ -68,5 +68,5 @@ export const generateDocumentName = (selected_preset: string) => {
 export const withTimeout = <T>(p: Promise<T>, ms = 4000) =>
   Promise.race([
     p,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('auth timeout')), ms)),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
   ])

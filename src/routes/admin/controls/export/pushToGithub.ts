@@ -1,4 +1,4 @@
-import { env } from '$lib/utils/utils';
+import { env } from '$env/dynamic/private';
 
 export async function pushFolderToGitHub(
 	files: Record<string, string>, // path -> csv content
@@ -7,7 +7,7 @@ export async function pushFolderToGitHub(
 	repo: string = 'ARC-Translations', //'ARC-Translations',
 	branch: string = 'main'
 ) {
-	const githubToken = env('ARC_TRANSLATIONS_PR_TOKEN');
+	const githubToken = env.ARC_TRANSLATIONS_PR_TOKEN;
 	const auth = {
 		headers: {
 			Authorization: `Bearer ${githubToken}`,

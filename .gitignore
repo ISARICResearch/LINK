@@ -3,8 +3,6 @@ node_modules
 
 # Output
 .output
-.hidden
-.hidden/
 .vercel
 .netlify
 .wrangler
@@ -24,3 +22,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Custom
+.hidden

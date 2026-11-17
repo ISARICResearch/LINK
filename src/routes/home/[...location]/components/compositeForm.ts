@@ -458,4 +458,5 @@ export async function handlePageTranslationSubmission(
 		await UpdatePATOnSubmission([...changed], profile.language as TranslationLanguage, 'review');
 	*/
 	console.time('composite-submission');
+	return;
 }

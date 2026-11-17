@@ -1,6 +1,6 @@
-import { env } from '$lib/utils/utils';
+import { PUBLIC_ARC_SOURCES_READ_TOKEN } from '$env/static/public';
 import Papa from 'papaparse';
-const githubToken = env('VITE_ARC_SOURCES_READ_TOKEN');
+const githubToken = PUBLIC_ARC_SOURCES_READ_TOKEN
 
 export async function GetArcPresets(
 	version: string

@@ -41,8 +41,8 @@ jobs:
           docker buildx build \
             --platform linux/arm64 \
             --build-arg VITE_SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}" \
-            --build-arg VITE_SUPABASE_ANON_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
-            --build-arg VITE_ARC_SOURCES_READ_TOKEN="${{ secrets.VITE_ARC_SOURCES_READ_TOKEN }}" \
+            --build-arg PUBLIC_SUPABASE_ANON_KEY="${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}" \
+            --build-arg PUBLIC_ARC_SOURCES_READ_TOKEN="${{ secrets.PUBLIC_ARC_SOURCES_READ_TOKEN }}" \
             --build-arg PUBLIC_USER_POOL_ID="${{ secrets.PUBLIC_USER_POOL_ID }}" \
             --build-arg PUBLIC_USER_POOL_CLIENT_ID="${{ secrets.PUBLIC_USER_POOL_CLIENT_ID }}" \
             -t ${{ secrets.ECR_REPOSITORY }}:latest \
@@ -121,7 +121,7 @@ jobs:
               docker run -d --restart unless-stopped --name link \
                 --log-driver json-file --log-opt max-size=10m --log-opt max-file=3 \
                 -p 3000:3000 \
-                -e VITE_ARC_SOURCES_READ_TOKEN="${{ secrets.VITE_ARC_SOURCES_READ_TOKEN }}" \
+                -e PUBLIC_ARC_SOURCES_READ_TOKEN="${{ secrets.PUBLIC_ARC_SOURCES_READ_TOKEN }}" \
                 -e ARC_TRANSLATIONS_PR_TOKEN="${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}" \
                 "${ECR_REPO}:latest"
 

@@ -21,7 +21,6 @@ type PageReturn = {
 		version: string;
 	} | null;
 };
-const failed: PageReturn = { profile: null, document: null };
 
 const attemptLinkProfile = async () => {
 	console.log('server link-profile');
@@ -85,12 +84,15 @@ const getDocument = async (profile: Profile) => {
 	return document;
 };
 
+const failed: PageReturn = { profile: null, document: null };
+
 export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	console.log('Root Layout Loading...');
 	try {
 		const { tokens } = await withTimeout(fetchAuthSession(), 8000);
 		console.log('Root Tokens ', tokens);
-		if (!tokens) {
+		if (!tokens) //throw Error("No Token, not signed in.") 
+			{
 			try {
 				console.log('No token, not signed in.');
 				//await trySignOut();

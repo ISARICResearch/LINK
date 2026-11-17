@@ -12,6 +12,7 @@
 	import CommentViewer from '../commentViewer.svelte';
 	import CompletionIndicator from '../completionIndicator.svelte';
 	import type { Database } from '$lib/supabase/database.types';
+	import { globalVariables } from '../../../global.svelte';
 
 	let {
 		completed, // has segment already been reviewed?
@@ -69,195 +70,201 @@
 </script>
 
 <!-- Top Label and Controls -->
-<div class="w-full flex justify-between">
-	<div class="flex p-0.5">
-		<!-- Open/Close Button-->
-		<button
-			class=" {completed ? ' opacity-60  ' : ''} 
-			{open ? '' : 'bg-stone-500/15 hover:shadow transition-shadow duration-10 shadow-stone-500/30'} 
-			flex group items-center text-stone-600 px-2 ml-1.5 rounded-full dark:text-stone-400 hover:underline cursor-pointer"
-			onclick={() => {
-				open = !open;
-			}}
-		>
-			<div
-				class="
+
+<div class=" md:ml-4">
+	<div class="w-full flex justify-between">
+		<div class="flex mr-7 w-full justify-between items-center">
+			<div class="flex w-1/2">
+				<!-- Open/Close Button -->
+				<button
+					title="Translate the following segment into {globalVariables.language}"
+					class=" {completed ? ' opacity-50  ' : ''} 
+					{open
+						? 'cursor-context-menu'
+						: 'bg-stone-500/10 hover:shadow transition-shadow duration-10 shadow-stone-500/50 cursor-pointer'} 
+					flex group items-center text-stone-600 px-2 -ml-2 rounded-full dark:text-stone-400 hover:underline"
+					onclick={() => {
+						open = !open;
+					}}
+				>
+					<div
+						class="
 				{completed && open
-					? 'border-stone-500/0 bg-stone-500/40 '
-					: completed && !open
-						? 'border-stone-500/40 bg-stone-500/10 '
-						: !completed && open
-							? 'bg-sky-500/50 border-sky-500/0'
-							: 'bg-sky-500/10 border-sky-500/40'}
+							? 'border-stone-500/0 bg-stone-500/40 '
+							: completed && !open
+								? 'border-stone-500/40 bg-stone-500/10 '
+								: !completed && open
+									? 'bg-sky-500/50 border-sky-500/0'
+									: 'bg-sky-500/10 border-sky-500/40'}
 
 					w-2 h-2 flex border-2 items-center rounded-full
 					 mr-1 p-0.5
 					 "
-			></div>
+					></div>
 
-			<span class="text-sm font-semibold italic">Review {typeLabels[label]}</span>
-		</button>
-		<!--Skip Button-->
-		<!--Completion Indicator-->
-		<CompletionIndicator
-			{completed}
-			{inProgress}
-			editing={false}
-			skipped={false}
-			{saving}
-			completedText={'reviewed'}
-		/>
-		<!-- Error Message-->
-		{#if error}
-			<span class="text-red-800 h-5 font-semibold px-3 ml-2 border border-red-800 text-sm">
-				{error}
-			</span>
-		{/if}
-	</div>
-</div>
-
-<!-- Main Content-->
-<div
-	class="flex pl-4 w-full h-full border-inherit transition-all {open
-		? ' max-h-300 duration-500 '
-		: 'max-h-0'}"
->
-	<!-- Review Form -->
-	{#if open}
-		<div class="w-full border-inherit mr-6 h-full">
-			<div
-				in:fade={{ duration: 200 }}
-				class="rounded border-2 border-inherit w-full h-full z-0 flex flex-wrap {completed
-					? ' opacity-70 '
-					: ''} 
-					{completed ? card.translate.complete : card.translate.incomplete} "
-			>
-				<!--Original Segment-->
-				<h3 class="w-full border-b border-inherit px-2">
-					{segment}
-				</h3>
-
-				<!-- Translation Options to select from -->
-				{#if options}
-					{#each Object.entries(options) as [text, option], _index}
-						{@const optionId:number = getEarliestEvent(Object.values(option)).id}
-						<div class="relative border-inherit w-full">
-							<fieldset id={segment} class="w-full flex border-inherit" role="radiogroup">
-								<!-- Option -->
-								<label
-									class="w-1/2 {completed
-										? ' '
-										: ' hover:bg-stone-100 dark:hover:bg-stone-700/70 cursor-pointer '}  border-r border-t border-inherit px-2"
-								>
-									<input
-										type="radio"
-										name={segment}
-										value={optionId}
-										checked={selectedTranslation == optionId}
-										disabled={completed}
-										onclick={() => {
-											if (error) error = undefined;
-											if (completed) return;
-											if (selectedTranslation === optionId) {
-												selectedTranslation = null; // Deselect
-											} else {
-												selectedTranslation = optionId; // Select
-											}
-										}}
-										class="dark:scheme-dark disabled:accent-amber-300 {completed
-											? ' '
-											: 'cursor-pointer'}"
-									/>
-									{text}
-								</label>
-
-								<!-- Option's Comments -->
-								<div
-									class="w-1/2 px-2 flex font-normal text-stone-800 dark:text-stone-300 italic border-t border-inherit overflow-y-auto"
-								>
-									{#each commentMap[text] as comment, i}
-										{comment}
-										{#if i < commentMap[text].length - 1}
-											&nbsp;| &nbsp;
-										{/if}
-									{/each}
-								</div>
-							</fieldset>
-
-							<!-- Add comment button-->
-							<div class="w-6 -right-[25.5px] top-0 opacity-100 absolute p-0.5 h-5">
-								{#if !completed}
-									<CommentViewer
-										interactable={!completed}
-										bind:live={comments[optionId]}
-										captured={'Test'}
-									/>
-								{/if}
-							</div>
-						</div>
-					{/each}
-				{/if}
-
-				<!-- Suggest New Translation -->
-				{#if completed}
-					<!-- existing translations and comment -->
-					<div class=" w-1/2 border-r px-2">{ftranslation}</div>
-					<div class=" w-1/2 px-2">{fcomment}</div>
-				{:else}
-					<div class=" border-t-2 w-1/2 border-r flex min-h-full border-inherit">
-						<label
-							class=" pl-2 pr-3 border-inherit rounded-b-md flex {completed
-								? ' '
-								: ' hover:bg-stone-100 dark:hover:bg-stone-700/70  cursor-pointer '}"
-						>
-							<input
-								type="radio"
-								name={segment}
-								value={'new'}
-								checked={selectedTranslation == 'new'}
-								disabled={completed}
-								onclick={() => {
-									if (completed) return;
-									if (selectedTranslation === 'new') {
-										selectedTranslation = null; // Deselect
-									} else {
-										selectedTranslation = 'new'; // Select
-									}
-								}}
-								class=" dark:scheme-dark disabled:accent-amber-300 {completed
-									? ' '
-									: 'cursor-pointer'}"
-							/>
-						</label>
-
-						<!-- translation input -->
-						<textarea
-							placeholder="Translate segment here..."
-							class="resize-none bg-white border-inherit w-full dark:bg-stone-700 px-2"
-							rows="1"
-							bind:value={ftranslation}
-							onkeydown={() => {
-								if (completed) return;
-								selectedTranslation = 'new'; // Select
-							}}
-						></textarea>
-					</div>
-
-					<div class="w-1/2 border-t-2 min-h-full border-inherit">
-						<!-- comment input -->
-						<textarea
-							placeholder="Provide justification here..."
-							class="bg-white h-5 border-inherit dark:bg-stone-700 rounded-br w-full min-h-full px-2"
-							rows="1"
-							bind:value={fcomment}
-							onkeydown={() => {
-								if (completed) return;
-								selectedTranslation = 'new'; // Select
-							}}
-						></textarea>
-					</div>
+					<span class="text-sm font-semibold italic">Review {typeLabels[label]}</span>
+				</button>
+				<CompletionIndicator
+					{completed}
+					{inProgress}
+					editing={false}
+					skipped={false}
+					{saving}
+					completedText={'reviewed'}
+				/>
+				<!-- Error Message-->
+				{#if error}
+					<span class="text-red-800 h-5 font-semibold px-3 ml-2 border border-red-800 text-sm">
+						{error}
+					</span>
 				{/if}
 			</div>
 		</div>
-	{/if}
+	</div>
+
+	<!-- Main Content-->
+	<div
+		class="flex w-full h-full border-inherit transition-all {open
+			? ' max-h-300 duration-500 '
+			: 'max-h-0'}"
+	>
+		<!-- Review Form -->
+		{#if open}
+			<div class="w-full border-inherit mr-6 h-full">
+				<div
+					in:fade={{ duration: 200 }}
+					class="rounded border-2 border-inherit w-full h-full z-0 flex flex-wrap {completed
+						? ' opacity-70 '
+						: ''} 
+					{completed ? card.translate.complete : card.translate.incomplete} "
+				>
+					<!--Original Segment-->
+					<h3 class="w-full border-b border-inherit px-2">
+						{segment}
+					</h3>
+
+					<!-- Translation Options to select from -->
+					{#if options}
+						{#each Object.entries(options) as [text, option], _index}
+							{@const optionId:number = getEarliestEvent(Object.values(option)).id}
+							<div class="relative border-inherit w-full">
+								<fieldset id={segment} class="w-full flex border-inherit" role="radiogroup">
+									<!-- Option -->
+									<label
+										class="w-1/2 {completed
+											? ' '
+											: ' hover:bg-stone-100 dark:hover:bg-stone-700/70 cursor-pointer '}  border-r border-t border-inherit px-2"
+									>
+										<input
+											type="radio"
+											name={segment}
+											value={optionId}
+											checked={selectedTranslation == optionId}
+											disabled={completed}
+											onclick={() => {
+												if (error) error = undefined;
+												if (completed) return;
+												if (selectedTranslation === optionId) {
+													selectedTranslation = null; // Deselect
+												} else {
+													selectedTranslation = optionId; // Select
+												}
+											}}
+											class="dark:scheme-dark disabled:accent-amber-300 {completed
+												? ' '
+												: 'cursor-pointer'}"
+										/>
+										{text}
+									</label>
+
+									<!-- Option's Comments -->
+									<div
+										class="w-1/2 px-2 flex font-normal text-stone-800 dark:text-stone-300 italic border-t border-inherit overflow-y-auto"
+									>
+										{#each commentMap[text] as comment, i}
+											{comment}
+											{#if i < commentMap[text].length - 1}
+												&nbsp;| &nbsp;
+											{/if}
+										{/each}
+									</div>
+								</fieldset>
+
+								<!-- Add comment button-->
+								<div class="w-6 -right-[25.5px] top-0 opacity-100 absolute p-0.5 h-5">
+									{#if !completed}
+										<CommentViewer
+											interactable={!completed}
+											bind:live={comments[optionId]}
+											captured={'Test'}
+										/>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					{/if}
+
+					<!-- Suggest New Translation -->
+					{#if completed}
+						<!-- existing translations and comment -->
+						<div class=" w-1/2 border-r px-2">{ftranslation}</div>
+						<div class=" w-1/2 px-2">{fcomment}</div>
+					{:else}
+						<div class=" border-t-2 w-1/2 border-r flex min-h-full border-inherit">
+							<label
+								class=" pl-2 pr-3 border-inherit rounded-b-md flex {completed
+									? ' '
+									: ' hover:bg-stone-100 dark:hover:bg-stone-700/70  cursor-pointer '}"
+							>
+								<input
+									type="radio"
+									name={segment}
+									value={'new'}
+									checked={selectedTranslation == 'new'}
+									disabled={completed}
+									onclick={() => {
+										if (completed) return;
+										if (selectedTranslation === 'new') {
+											selectedTranslation = null; // Deselect
+										} else {
+											selectedTranslation = 'new'; // Select
+										}
+									}}
+									class=" dark:scheme-dark disabled:accent-amber-300 {completed
+										? ' '
+										: 'cursor-pointer'}"
+								/>
+							</label>
+
+							<!-- translation input -->
+							<textarea
+								placeholder="Translate segment here..."
+								class="resize-none bg-white border-inherit w-full dark:bg-stone-700 px-2"
+								rows="1"
+								bind:value={ftranslation}
+								onkeydown={() => {
+									if (completed) return;
+									selectedTranslation = 'new'; // Select
+								}}
+							></textarea>
+						</div>
+
+						<div class="w-1/2 border-t-2 min-h-full border-inherit">
+							<!-- comment input -->
+							<textarea
+								placeholder="Provide justification here..."
+								class="bg-white h-5 border-inherit dark:bg-stone-700 rounded-br w-full min-h-full px-2"
+								rows="1"
+								bind:value={fcomment}
+								onkeydown={() => {
+									if (completed) return;
+									selectedTranslation = 'new'; // Select
+								}}
+							></textarea>
+						</div>
+					{/if}
+				</div>
+			</div>
+		{/if}
+	</div>
 </div>

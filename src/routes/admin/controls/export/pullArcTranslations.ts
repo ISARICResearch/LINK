@@ -1,4 +1,4 @@
-import { env } from '$lib/utils/utils';
+import { PUBLIC_ARC_SOURCES_READ_TOKEN } from '$env/static/public';
 import Papa from 'papaparse';
 
 // <T>
@@ -221,7 +221,7 @@ export async function pullArcTranslations(version: string) {
 	}
 
 	// + set github authentication and arch version we are looking for
-	const githubToken = env('VITE_ARC_SOURCES_READ_TOKEN');
+	const githubToken = PUBLIC_ARC_SOURCES_READ_TOKEN
 	const githubAuth = { headers: { Authorization: `Bearer ${githubToken}` } };
 
 	// = ( 1 ) = Get list of files to download

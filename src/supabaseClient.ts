@@ -1,11 +1,11 @@
-import '$lib/amplify'
+import '$lib/amplify';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './lib/supabase/database.types.js';
-import { env } from '$lib/utils/utils.js';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 
-const supabaseUrl = env('VITE_SUPABASE_URL');
-const supabaseAnonKey = env('VITE_SUPABASE_ANON_KEY');
+const supabaseUrl = PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = PUBLIC_SUPABASE_ANON_KEY;
 const fetchCognito = {
 	accessToken: async () => {
 		const { tokens } = await fetchAuthSession();

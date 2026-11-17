@@ -32,6 +32,6 @@ jobs:
         env:
           PUBLIC_ARC_SOURCES_READ_TOKEN: ${{ secrets.PUBLIC_ARC_SOURCES_READ_TOKEN }}
           ARC_TRANSLATIONS_PR_TOKEN: ${{ secrets.ARC_TRANSLATIONS_PR_TOKEN }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_ADMIN_KEY: ${{ secrets.SUPABASE_ADMIN_KEY }}

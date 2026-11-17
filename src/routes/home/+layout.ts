@@ -13,7 +13,6 @@ import { supabase } from '../../supabaseClient';
 import { loading } from '../components/loading/loadingState.svelte';
 import { setDocument, setLanguage, setProfile } from './global.svelte';
 import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
-import { withTimeout } from '$lib/utils/utils';
 import { trySignOut } from '$lib/auth';
 
 export const ssr = false;
@@ -23,24 +22,23 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 	loading.message = 'Getting document...';
 	loading.active = true;
 
-	console.time('/home/ handle profile');
+	console.time('Home: root. profile, document');
 	const { profile, document } = await parent();
-	console.timeEnd('/home/ handle profile');
+	console.timeEnd('Home: root. profile, document');
 
 	loading.active = false;
 
-	console.time('/home/ check user');
-	console.log('home, Check user is signed in...');
-	
+	console.time('Home: check user is signed in');
 	try {
-		const { username, userId, signInDetails } = await withTimeout(getCurrentUser());
-		console.log('home, Check user is signed in RESULT:', username, userId, signInDetails);
+		const { username, userId, signInDetails } = await getCurrentUser();
+		console.log('Home: check user is signed in RESULT:', username, userId, signInDetails);
 	} catch (error) {
 		console.error('HOME: Auth session failed, resetting local auth state', error);
 		await trySignOut();
 		// AIDAN COME HERE
 		// If it fails, check this.
 	}
+	console.time('Home: check user is signed in');
 
 	depends('app:data');
 
@@ -66,7 +64,7 @@ async function loadDataProgressively(
 	language: string,
 	document: DocumentRow | null
 ) {
-	console.time('/home/ pulling data');
+	console.time('Home: pulling data');
 	loading.message = 'Pulling segments...';
 	loading.active = true;
 	const segmentMap: SegmentMap = {};

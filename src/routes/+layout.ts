@@ -4,9 +4,10 @@ import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
 import type { Profile } from '$lib/types';
-import { withTimeout } from '$lib/utils/utils';
-import { signOut } from 'aws-amplify/auth';
-import { trySignOut } from '$lib/auth';
+import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
+//import { withTimeout } from '$lib/utils/utils';
+//import { signOut } from 'aws-amplify/auth';
+//import { trySignOut } from '$lib/auth';
 //import { trySignOut } from '$lib/auth';
 
 export const ssr = false;
@@ -87,12 +88,25 @@ const getDocument = async (profile: Profile) => {
 const failed: PageReturn = { profile: null, document: null };
 
 export const load: LayoutLoad = async (): Promise<PageReturn> => {
-	console.log('Root Layout Loading...');
-	try {
-		const { tokens } = await withTimeout(fetchAuthSession(), 8000);
-		console.log('Root Tokens ', tokens);
-		if (!tokens) //throw Error("No Token, not signed in.") 
-			{
+	console.log('Root: loading...');
+
+	console.log('Cognito config', {
+		userPoolId: PUBLIC_USER_POOL_ID,
+		clientId: PUBLIC_USER_POOL_CLIENT_ID,
+	});
+
+	const { tokens } = await fetchAuthSession();
+	if (!tokens) {
+		console.log('Root: Not logged in.');
+		return failed;
+	}
+	/*
+		try {
+			const { tokens } = await withTimeout(fetchAuthSession(), 10);
+			console.log('Root Tokens ', tokens);
+			if (!tokens) throw Error('No Token, not signed in.');
+
+			
 			try {
 				console.log('No token, not signed in.');
 				//await trySignOut();
@@ -101,18 +115,20 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 			} catch {
 				return failed;
 			}
+		} catch (error) {
+			console.error('ROOT Auth session failed, resetting local auth state', error);
+			await trySignOut();
+			return failed;
 		}
-	} catch (error) {
-		console.error('ROOT Auth session failed, resetting local auth state', error);
-		await  trySignOut();
-		return failed;
-	}
+	*/
 
+	console.log('Root: Logged in!', tokens);
 	const { data: profile, error } = await supabase.rpc('retrieve_profile');
 
 	if (error) console.error(error);
+
 	if (profile?.id) {
-		console.log('LOGIN: Signing in with existing profile', profile);
+		console.log('Root: Found existing profile', profile);
 		const document = await getDocument(profile);
 		return {
 			profile,
@@ -122,7 +138,7 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	if (!profile?.id) {
 		const linked_profile = await attemptLinkProfile();
 		if (linked_profile?.id) {
-			console.log('LOGIN: Signing in with newly linked profile', linked_profile);
+			console.log('Root: Signing in with newly linked profile', linked_profile);
 			const document = await getDocument(linked_profile);
 			return {
 				profile: linked_profile,
@@ -130,6 +146,6 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 			};
 		}
 	}
-	console.log('LOGIN: Signing in without existing profile');
+	console.log('Root: Signing in without existing profile');
 	return failed;
 };

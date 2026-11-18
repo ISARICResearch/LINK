@@ -29,7 +29,10 @@ const attemptLinkProfile = async () => {
 	const idToken = tokens?.idToken?.toString();
 	const accessToken = tokens?.accessToken?.toString();
 
-	if (!idToken || !accessToken) throw new Error('not signed in');
+	if (!idToken || !accessToken) {
+		console.error('not signed in');
+		return null;
+	}
 
 	const res = await fetch('/api/link-profile', {
 		method: 'POST',

@@ -5,7 +5,7 @@
 		SegmentMap,
 		TranslationReviewRow
 	} from '$lib/supabase/types';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import type { Profile } from '$lib/types';
 	import { button } from '$lib/styles';
 	import { sortSegmentMap } from '$lib/utils/utils';
@@ -114,7 +114,7 @@
 
 	let profileId = $derived(profile.id);
 
-	onMount(async () => {
+	const initialize = async () => {
 		loading.active = true;
 		loading.message = 'Pulling related data...';
 		console.time('related-new');
@@ -129,6 +129,15 @@
 		// pull other reviews for these segments
 		initializeReviewCommentsToPush(pageTranslations);
 		loading.active = false;
+	};
+
+	onMount(async () => {
+		//await initialize();
+	});
+
+	$effect(() => {
+		const _track = [segmentMap, relatedTranslationsProm, relatedReviewsProm];
+		untrack(() => initialize());
 	});
 
 	async function handleSubmit(shouldContinue: boolean, forward: boolean) {
@@ -141,6 +150,7 @@
 			// Handle organizing and submitting changes to SupaBase
 			await handlePageTranslationSubmission(pageSubmissions, profile, changed);
 
+			console.log('Reload page!');
 			loading.message = 'Reloading...';
 			// Reload data
 			await invalidate('app:data');

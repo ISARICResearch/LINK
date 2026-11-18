@@ -4,7 +4,7 @@ import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
 import type { Profile } from '$lib/types';
-import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
+//import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
 //import { withTimeout } from '$lib/utils/utils';
 //import { signOut } from 'aws-amplify/auth';
 //import { trySignOut } from '$lib/auth';
@@ -90,11 +90,6 @@ const failed: PageReturn = { profile: null, document: null };
 export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	console.log('Root: loading...');
 
-	console.log('Cognito config', {
-		userPoolId: PUBLIC_USER_POOL_ID,
-		clientId: PUBLIC_USER_POOL_CLIENT_ID,
-	});
-
 	const { tokens } = await fetchAuthSession();
 	if (!tokens) {
 		console.log('Root: Not logged in.');
@@ -122,13 +117,12 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 		}
 	*/
 
-	console.log('Root: Logged in!', tokens);
 	const { data: profile, error } = await supabase.rpc('retrieve_profile');
 
 	if (error) console.error(error);
 
 	if (profile?.id) {
-		console.log('Root: Found existing profile', profile);
+		//console.log('Root: Found existing profile', profile);
 		const document = await getDocument(profile);
 		return {
 			profile,

@@ -11,7 +11,7 @@ import {
 	InsertTranslationReviews,
 	UpdateForwardTranslations
 } from '$lib/supabase/utils';
-import type { Profile, TranslationLanguage } from '$lib/types';
+import type { Profile } from '$lib/types';
 import { updateProgressAcceptedForSegments } from '$lib/utils/repairTranslations';
 import _ from 'lodash';
 
@@ -112,7 +112,7 @@ export function initPageTranslations(
 						reviews.flatMap((r) => Object.keys(r.comments as Record<number, unknown>).map(Number))
 					)
 				: new Set();
-			const reviewed: boolean = (+id) in reviewedTranslations;
+			const reviewed: boolean = reviewedTranslations.has(+id);
 
 			// If something pushed, but no reviewed, allow edit
 			if (!reviewed) {
@@ -192,6 +192,9 @@ export function transformPageForSubmission(
 	//console.log('transforPageForSubmission segments:', segments);
 	const submissions: PageSubmissions = blankPageSubmissions();
 
+	if (!profile.language) return submissions;
+	const language: string = profile.language;
+
 	const handleForwardPush = () => {
 		const newForwardTranslations: ForwardTranslationInsert[] = [];
 
@@ -202,25 +205,25 @@ export function transformPageForSubmission(
 				newForwardTranslations.push({
 					original_id: Number(id),
 					user_id: profile.id,
-					language: profile.language as TranslationLanguage,
+					language: language,
 					translation: '',
 					comment: page.forwardPush[id].comment,
-					skipped: page.forwardPush[id].skipped
+					skipped: true
+				});
+			} else {
+				// Ignore if no text data
+				if (page.forwardPush[id].translation == '' || !page.forwardPush[id].translation) continue;
+
+				// New Translation
+				newForwardTranslations.push({
+					original_id: Number(id),
+					user_id: profile.id,
+					language: language,
+					translation: page.forwardPush[id].translation.trim(),
+					comment: page.forwardPush[id].comment.trim(),
+					skipped: false
 				});
 			}
-
-			// Ignore if no text data
-			if (page.forwardPush[id].translation == '' || !page.forwardPush[id].translation) continue;
-
-			// New Translation
-			newForwardTranslations.push({
-				original_id: Number(id),
-				user_id: profile.id,
-				language: profile.language as TranslationLanguage,
-				translation: page.forwardPush[id].translation.trim(),
-				comment: page.forwardPush[id].comment.trim(),
-				skipped: page.forwardPush[id].skipped
-			});
 		}
 
 		return newForwardTranslations;
@@ -378,7 +381,7 @@ export function transformPageForSubmission(
 				newReviews.push({
 					original_id: +id,
 					reviewer_id: profile.id,
-					language: profile.language as TranslationLanguage,
+					language: language,
 					translation_id: cleanedReviews[id].translation_id,
 					comments: cleanedReviews[id].comments
 				});
@@ -389,14 +392,14 @@ export function transformPageForSubmission(
 				newReviews.push({
 					original_id: +id,
 					reviewer_id: profile.id,
-					language: profile.language as TranslationLanguage,
+					language: language,
 					translation_id: null,
 					comments: cleanedReviews[id].comments
 				});
 				newTranslations.push({
 					original_id: Number(id),
 					user_id: profile.id,
-					language: profile.language as TranslationLanguage,
+					language: language,
 					translation: cleanedReviews[id].ftranslation ?? '',
 					comment: cleanedReviews[id].fcomment ?? '',
 					skipped: false
@@ -431,19 +434,24 @@ export async function handlePageTranslationSubmission(
 	profile: Profile,
 	changed: Set<number>
 ) {
-	console.time('composite-submission');
+	console.time('submit data');
 	console.log('PageSubmissions:', page);
 	console.log('changed:', changed);
 
+	if (!profile.language) return;
+	const language: string = profile.language;
+	
 	// Insert new translations to supabase ForwardTranslations table
 	const tasks: Promise<unknown>[] = [];
 	if (page.forwardPush.length > 0) tasks.push(InsertForwardTranslations(page.forwardPush));
 	if (page.reviewPush.length > 0) tasks.push(InsertTranslationReviews(page.reviewPush));
 	if (page.forwardEdit.length > 0) tasks.push(UpdateForwardTranslations(page.forwardEdit));
 	await Promise.all(tasks);
+	console.timeEnd('submit data');
 
-	await updateProgressAcceptedForSegments([...changed], profile.language as TranslationLanguage);
-
+	console.time('update progress');
+	await updateProgressAcceptedForSegments([...changed], language);
+	console.timeEnd('update progress');
 	/*
 	AIDAN: here we go, this is where I need to be.
 	*/
@@ -455,8 +463,7 @@ export async function handlePageTranslationSubmission(
 		await UpdateProgress_ForwardSubmission(page.forwardPush, 'review');
 
 	if (page.reviewPush.length > 0)
-		await UpdatePATOnSubmission([...changed], profile.language as TranslationLanguage, 'review');
+		await UpdatePATOnSubmission([...changed], profile.language, 'review');
 	*/
-	console.time('composite-submission');
 	return;
 }

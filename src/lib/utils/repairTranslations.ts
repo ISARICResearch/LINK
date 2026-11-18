@@ -22,7 +22,6 @@ import type {
 	TranslationProgressRow
 } from '$lib/supabase/types';
 import { getLatestEvent } from '$lib/supabase/utils';
-import type { TranslationLanguage } from '$lib/types';
 import { supabase } from '../../supabaseClient';
 import { pullLink, pullPartialLink, type LinkStructure } from './pullLink';
 
@@ -45,15 +44,15 @@ export const repairLink = async (version: string) => {
 
 export const updateProgressAcceptedForSegments = async (
 	ids: number[],
-	language: TranslationLanguage
+	language: string
 ) => {
-	console.time('update PATs');
+	console.time('   update PATs');
 	const link = await pullPartialLink(ids, language);
-	console.log('partial link', link);
+	console.log('   partial link', link);
 	const upsertPAT = constructUpsertPAT(link);
-	console.log('upsertPAT', upsertPAT);
+	console.log('   upsertPAT', upsertPAT);
 	await pushUpsertPAT(upsertPAT);
-	console.timeEnd('update PATs');
+	console.timeEnd('   update PATs');
 	return;
 };
 
@@ -85,7 +84,7 @@ const constructUpsertPAT = (link: LinkStructure): UpsertPAT => {
 			if (shouldReview) calculatedStep = 'review';
 			if (best_ft?.canAdjudicate) calculatedStep = 'adjudication';
 
-			console.log('calculatedStep', calculatedStep);
+			console.log('     calculatedStep', calculatedStep);
 
 			// * create a new progress if missing
 			const noProgress = obj.translationProgress == undefined;
@@ -120,7 +119,7 @@ const constructUpsertPAT = (link: LinkStructure): UpsertPAT => {
 			// Re-calculate Accepted Translation
 			const current_at = getLatestEvent(obj.acceptedTranslations ?? []);
 
-			console.log('current_at', current_at);
+			console.log('     current_at', current_at);
 
 			// == otherwise, create new AT row
 			const new_at: AcceptedTranslationInsert = {
@@ -131,7 +130,7 @@ const constructUpsertPAT = (link: LinkStructure): UpsertPAT => {
 				score: String(best_ft.score)
 			};
 
-			console.log('new_at', new_at);
+			console.log('     new_at', new_at);
 
 			if (!new_at.score) continue;
 			// New AT
@@ -152,7 +151,7 @@ const constructUpsertPAT = (link: LinkStructure): UpsertPAT => {
 
 const pushUpsertPAT = async (upserts: UpsertPAT) => {
 	if (upserts.progress.length > 0) {
-		console.log('progressUpsert', upserts.progress);
+		console.log('     progressUpsert', upserts.progress);
 		const inserts = upserts.progress.filter(
 			(r): r is TranslationProgressInsert => r.id === undefined
 		);
@@ -171,7 +170,7 @@ const pushUpsertPAT = async (upserts: UpsertPAT) => {
 	}
 
 	if (upserts.accepted.length > 0) {
-		console.log('acceptedUpsert', upserts.accepted);
+		console.log('     acceptedUpsert', upserts.accepted);
 		const inserts = upserts.accepted.filter(
 			(r): r is AcceptedTranslationInsert => r.id === undefined
 		);

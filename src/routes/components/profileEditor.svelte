@@ -6,6 +6,7 @@
 	import { fetchAuthSession } from 'aws-amplify/auth';
 	import { invalidateAll } from '$app/navigation';
 	import { globalVariables } from '../home/global.svelte';
+	import { error } from '@sveltejs/kit';
 
 	let profile = $derived(globalVariables.profile);
 
@@ -43,6 +44,16 @@
 
 		if (!idToken || !accessToken) throw new Error('not signed in');
 
+		const res = await supabase.rpc('update_profile', {
+			u_lang: editedProfile.language,
+			u_prof: editedProfile.profession
+		});
+
+		console.log(res);
+		if (res.error) console.error(error);
+		else await invalidateAll();
+
+		/*
 		const res = await fetch('/api/update-profile', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -57,9 +68,7 @@
 		if (!res.ok) {
 			const { error } = await res.json();
 			console.error('Error updating profile:', error.message);
-		}
-
-		await invalidateAll();
+		}*/
 	};
 </script>
 

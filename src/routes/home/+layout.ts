@@ -38,7 +38,7 @@ export const load: LayoutLoad = async ({ parent, depends }) => {
 		// AIDAN COME HERE
 		// If it fails, check this.
 	}
-	console.time('Home: check user is signed in');
+	console.timeEnd('Home: check user is signed in');
 
 	depends('app:data');
 
@@ -94,8 +94,8 @@ async function loadDataProgressively(
 		),
 		await supabase.from('documents').select('id, title, version')
 	]);
-	console.time('/home/ pulling data');
-	console.time('/home/ computing data');
+	console.timeEnd('Home: pulling data');
+	console.time('Home: computing data');
 
 	// = ( 2 ) = Create Segment map from original segments
 	(original_segments || []).forEach((segment) => {
@@ -152,8 +152,8 @@ async function loadDataProgressively(
 			documentMap[document.title].push(document);
 		}
 	}*/
-	console.time('/home/ computing data');
-	console.log('/home/ == complete ==');
+	console.timeEnd('Home: computing data');
+	console.log('Home: == complete ==');
 
 	loading.active = false;
 	return {

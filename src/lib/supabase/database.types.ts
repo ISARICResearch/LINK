@@ -293,7 +293,7 @@ export type Database = {
           cognito_id?: string | null
           created_at?: string
           email?: string | null
-          id: string
+          id?: string
           is_admin?: boolean
           language?: string | null
           name?: string | null
@@ -437,6 +437,7 @@ export type Database = {
           match_threshold?: number
           max_batches?: number
           min_accepted_score?: number
+          p_language: string
           p_segment_id: number
           p_user_id: string
         }
@@ -447,12 +448,14 @@ export type Database = {
           forward_translation_text: string
           score: number
           segment_id: number
+          segment_location: string[]
           segment_text: string
+          user_owned: boolean
         }[]
       }
       get_valid_and_user_suggestion: {
         Args: {
-          p_language: Database["public"]["Enums"]["Language"]
+          p_language: string
           p_min_score: number
           p_segment_id: number
           p_user_id: string
@@ -509,10 +512,12 @@ export type Database = {
         }
       }
       test_auth: { Args: never; Returns: Json }
-      update_profile: {
-        Args: { u_lang: string; u_prof: string }
-        Returns: undefined
-      }
+      update_profile:
+        | { Args: { u_lang: string; u_prof: string }; Returns: undefined }
+        | {
+            Args: { u_lang: string; u_prof: string; u_sub: string }
+            Returns: undefined
+          }
     }
     Enums: {
       LabelType: "form" | "section"

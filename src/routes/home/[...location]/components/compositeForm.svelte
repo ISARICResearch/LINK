@@ -112,8 +112,6 @@
 		})
 	);
 
-	//let allSuggestions = $derived.by(() => getSuggestedTranslations(forwardIds, profile.id));
-
 	let profileId = $derived(profile.id);
 
 	onMount(async () => {

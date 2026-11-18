@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { button, shadow } from '$lib/styles';
-	import { fetchAuthSession, signInWithRedirect, signOut } from 'aws-amplify/auth';
+	import { shadow } from '$lib/styles';
+	import { fetchAuthSession, signInWithRedirect } from 'aws-amplify/auth';
 	import ThemeManager from './components/themeManager.svelte';
 	import { goto } from '$app/navigation';
-	import { supabase } from '../supabaseClient';
 
 	const start_style =
 		'flex max-w-80 justify-center w-full p-6 flex-col font-semibold rounded-xl  text-center bg-linear-15 from-green-800/80 to-green-400/50 shadow-lg  ' +
@@ -66,44 +65,44 @@
 			}}
 			class=" mx-auto text-4xl {start_interaction} {start_style} ">Sign In</button
 		>
-		
-			<button
-				onclick={async () => {
-					const { data: profile, error } = await supabase.rpc('retrieve_profile');
-					console.log('retrieve_profile BUTTON', profile, error);
-				}}
-				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-					.green.default} {button.green.hover}"
-			>
-				retrieve_profile
-			</button>
-			<button
-				onclick={async () => {
-					const { data, error } = await supabase.rpc('test_auth');
-					console.log('test_auth BUTTON', data, error);
-				}}
-				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-					.green.default} {button.green.hover}"
-			>
-				test_auth
-			</button>
-			<button
-				onclick={async () => {
-					const { tokens } = await fetchAuthSession();
-					console.log(tokens?.idToken?.payload);
-				}}
-				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-					.green.default} {button.green.hover}"
-			>
-				tokens
-			</button>
-			<button
-				onclick={() => signOut()}
-				class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-					.green.default} {button.green.hover}"
-			>
-				sign out
-			</button>
+		<!--
+		<button
+			onclick={async () => {
+				const { data: profile, error } = await supabase.rpc('retrieve_profile');
+				console.log('retrieve_profile BUTTON', profile, error);
+			}}
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+				.green.default} {button.green.hover}"
+		>
+			retrieve_profile
+		</button>
+		<button
+			onclick={async () => {
+				const { data, error } = await supabase.rpc('test_auth');
+				console.log('test_auth BUTTON', data, error);
+			}}
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+				.green.default} {button.green.hover}"
+		>
+			test_auth
+		</button>
+		<button
+			onclick={async () => {
+				const { tokens } = await fetchAuthSession();
+				console.log(tokens?.idToken?.payload);
+			}}
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+				.green.default} {button.green.hover}"
+		>
+			tokens
+		</button>
+		<button
+			onclick={() => signOut()}
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
+				.green.default} {button.green.hover}"
+		>
+			sign out
+		</button>-->
 	</div>
 </div>
 

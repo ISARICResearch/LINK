@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { getSuggestedTranslation } from './suggestion';
+	import { getSuggestedTranslations } from './suggestion';
 	import { onMount } from 'svelte';
 	import type { TranslationStep } from '$lib/supabase/types';
 	import type { FindSimilarSegmentsResult } from '$lib/types';
+	import { globalVariables } from '../../../global.svelte';
 	let {
 		id,
 		profileId,
@@ -19,8 +20,11 @@
 		confidence: Confidence;
 		count: number | undefined;
 	} = $props();
+
 	type Confidence = 0 | 1 | 2;
-	let suggestionPromise = $derived.by(() => getSuggestedTranslation(id, profileId));
+	let suggestionPromise = $derived.by(() =>
+		getSuggestedTranslations(id, profileId, globalVariables.language)
+	);
 
 	onMount(async () => {
 		const result = await suggestionPromise;
@@ -107,48 +111,62 @@
 										)} bg-stone-100 dark:bg-stone-900 w-full px-1 p-0.5 border-2 flex-col active:bg-white dark:active:bg-stone-700 dark:active:bg shadow-none flex font-normal cursor-pointer opacity-80 hover:opacity-100 rounded-lg hover:shadow"
 									>
 										<div
-											class="flex italic border-b border-stone-400/50 text-stone-700/90 dark:text-stone-200 font-semibold flex-row text-sm"
+											class="flex italic justify-between border-b border-stone-400/50 text-stone-700/90 dark:text-stone-200 font-semibold flex-row text-sm"
 										>
-											{@render symbol()}
-											<p
-												title="{score}% match with original text"
-												class="pl-1 pr-2 rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 cursor-context-menu"
-											>
-												<b class={matchColor(score)}>{score}%</b> match
-											</p>
-											—
+											<div class="flex">
+												{@render symbol()}
+												<p
+													title="{score}% match with original text"
+													class="pl-1 pr-2 rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 cursor-context-menu"
+												>
+													<b class={matchColor(score)}>{score}%</b> match
+												</p>
+												—
 
-											<p
-												title={label == 'Accepted'
-													? 'Translation was accepted as correct.'
-													: 'Translation has not yet been accepted as correct.'}
-												class="px-2 rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 cursor-context-menu flex items-center {stepColor(
-													label
-												)}"
-											>
-												{#if label == 'Accepted'}
-													<svg
-														class="w-5 h-full px-0.5 stroke-sky-600 fill-sky-600"
-														xmlns="http://www.w3.org/2000/svg"
-														width="24"
-														height="24"
-														viewBox="0 0 12 12"
-														stroke-width="0.5"
+												<p
+													title={label == 'Accepted'
+														? 'Translation was accepted as correct.'
+														: 'Translation has not yet been accepted as correct.'}
+													class="px-2 rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 cursor-context-menu flex items-center {stepColor(
+														label
+													)}"
+												>
+													{#if label == 'Accepted'}
+														<svg
+															class="w-5 h-full px-0.5 stroke-sky-600 fill-sky-600"
+															xmlns="http://www.w3.org/2000/svg"
+															width="24"
+															height="24"
+															viewBox="0 0 12 12"
+															stroke-width="0.5"
+														>
+															<path
+																fill-rule="evenodd"
+																d="M10.78 2.62a.75.75 0 0 1 0 1.06L4.683 9.777a.75.75 0 0 1-1.069-.009L1.211 7.284a.75.75 0 0 1 1.078-1.043l1.873 1.936L9.72 2.62a.75.75 0 0 1 1.06 0"
+																clip-rule="evenodd"
+															/>
+														</svg>
+													{:else}
+														<span
+															class="w-2.5 h-2.5 mr-0.5 border-yellow-700 border-2 rounded-sm bg-yellow-700/0"
+														></span>
+													{/if}
+
+													{label}
+												</p>
+											</div>
+											<div>
+												{#if s.user_owned}
+													<p
+														title="This is a translation you provided."
+														class="px-2 rounded-sm hover:bg-stone-200 dark:hover:bg-stone-700/50 cursor-context-menu flex items-center {stepColor(
+															label
+														)}"
 													>
-														<path
-															fill-rule="evenodd"
-															d="M10.78 2.62a.75.75 0 0 1 0 1.06L4.683 9.777a.75.75 0 0 1-1.069-.009L1.211 7.284a.75.75 0 0 1 1.078-1.043l1.873 1.936L9.72 2.62a.75.75 0 0 1 1.06 0"
-															clip-rule="evenodd"
-														/>
-													</svg>
-												{:else}
-													<span
-														class="w-2.5 h-2.5 mr-0.5 border-yellow-700 border-2 rounded-sm bg-yellow-700/0"
-													></span>
+														Your Translation
+													</p>
 												{/if}
-
-												{label}
-											</p>
+											</div>
 										</div>
 										<p class=" text-sm text-left text-stone-700 dark:text-stone-100 italic">
 											<span

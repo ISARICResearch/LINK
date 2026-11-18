@@ -18,42 +18,24 @@ Or if translation is accepted with at least score of 2.
 
 */
 
-import type { FindSimilarSegmentsResult, PromiseSuggestions } from '$lib/types';
+import type { FindSimilarSegmentsResult } from '$lib/types';
 import { supabase } from '../../../../../supabaseClient';
 
 export async function getSuggestedTranslations(
-	ids: number[],
-	profileId: string
-): PromiseSuggestions {
-	const calls = ids.map((id) =>
-		supabase.rpc('find_similar_segments', {
-			p_segment_id: id,
-			p_user_id: profileId,
-			min_accepted_score: 0
-		})
-	);
-
-	const results = await Promise.all(calls);
-
-	const data: Record<number, FindSimilarSegmentsResult> = Object.fromEntries(
-		ids.map((id, index) => [id, results[index].data ?? []])
-	);
-
-	return data;
-}
-
-export async function getSuggestedTranslation(
 	id: number,
-	profileId: string
+	profileId: string,
+	language: string
 ): Promise<FindSimilarSegmentsResult> {
 	const result = await supabase.rpc('find_similar_segments', {
 		p_segment_id: id,
 		p_user_id: profileId,
-		min_accepted_score: 2,
+		p_language: language,
+		//min_accepted_score: 2,
 		//batch_size: 10,
-		match_count: 3,
-		match_threshold: 0.5,
+		//match_count: 3,
+		match_threshold: 0.3,
 		//max_batches: 10
 	});
+	if (result.error) console.warn(result.error)
 	return result.data ?? [];
 }

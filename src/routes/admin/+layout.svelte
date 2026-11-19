@@ -27,20 +27,6 @@
 
 	onMount(() => {
 		handleSessionCheck();
-
-		supabase.auth.onAuthStateChange((_event, _session) => {
-			session = _session;
-			if (!session) {
-				window.location.href = '/';
-			} else {
-				checkAdminStatus(session.user.id).then((adminStatus) => {
-					isAdmin = adminStatus;
-					if (!isAdmin && window.location.pathname === '/admin') {
-						window.location.href = '/404';
-					}
-				});
-			}
-		});
 	});
 </script>
 

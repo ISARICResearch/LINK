@@ -33,23 +33,6 @@
 <div class="w-full max-w-96 my-auto mx-auto">
 	<div class="flex-wrap border-inherit p-4">
 		<p class="font-bold text-stone-700 dark:text-stone-300 w-full text-center mt-15"></p>
-		<!--
-			<a
-				data-sveltekit-preload-code="eager"
-				class="w-full block max-w-80 m-auto text-3xl font-semibold rounded-xl border-3 cursor-pointer p-2 text-center {button
-					.green.default} {button.green.hover}"
-				href="/login"
-			>
-				Login
-			</a>
-			<p class="font-bold text-stone-700 dark:text-stone-300 w-full text-center mt-3"></p>
-			<a
-				data-sveltekit-preload-code="eager"
-				class="{button.stoneHover} {buttonStyle} text-md"
-				href="/register"
-			>
-				Create Account
-			</a>-->
 
 		<button
 			onclick={async () => {
@@ -71,8 +54,7 @@
 				const { data: profile, error } = await supabase.rpc('retrieve_profile');
 				console.log('retrieve_profile BUTTON', profile, error);
 			}}
-			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-				.green.default} {button.green.hover}"
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center opacity-70 hover:opacity-100 active:opacity-50"
 		>
 			retrieve_profile
 		</button>
@@ -81,25 +63,23 @@
 				const { data, error } = await supabase.rpc('test_auth');
 				console.log('test_auth BUTTON', data, error);
 			}}
-			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-				.green.default} {button.green.hover}"
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center opacity-70 hover:opacity-100 active:opacity-50"
 		>
 			test_auth
 		</button>
 		<button
 			onclick={async () => {
 				const { tokens } = await fetchAuthSession();
-				console.log(tokens?.idToken?.payload);
+				console.log(tokens);
 			}}
-			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-				.green.default} {button.green.hover}"
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center opacity-70 hover:opacity-100 active:opacity-50"
 		>
 			tokens
 		</button>
+		
 		<button
 			onclick={() => signOut()}
-			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center {button
-				.green.default} {button.green.hover}"
+			class=" w-full block max-w-40 m-auto text-xl font-semibold rounded-xl border-4 cursor-pointer p-2 text-center opacity-70 hover:opacity-100 active:opacity-50"
 		>
 			sign out
 		</button>-->

@@ -4,8 +4,9 @@ import { fetchAuthSession } from 'aws-amplify/auth/server';
 import { supabase } from '../supabaseClient';
 import type { LayoutLoad } from './home/$types';
 import type { Profile } from '$lib/types';
+import { TimeoutError, withTimeout } from '$lib/utils/utils';
+import { refreshAll } from '$app/navigation';
 //import { PUBLIC_USER_POOL_CLIENT_ID, PUBLIC_USER_POOL_ID } from '$env/static/public';
-//import { withTimeout } from '$lib/utils/utils';
 //import { signOut } from 'aws-amplify/auth';
 //import { trySignOut } from '$lib/auth';
 //import { trySignOut } from '$lib/auth';
@@ -93,32 +94,16 @@ const failed: PageReturn = { profile: null, document: null };
 export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	console.log('Root: loading...');
 
-	const { tokens } = await fetchAuthSession();
-	if (!tokens) {
-		console.log('Root: Not logged in.');
-		return failed;
-	}
-	/*
-		try {
-			const { tokens } = await withTimeout(fetchAuthSession(), 10);
-			console.log('Root Tokens ', tokens);
-			if (!tokens) throw Error('No Token, not signed in.');
-
-			
-			try {
-				console.log('No token, not signed in.');
-				//await trySignOut();
-				await withTimeout(signOut({ global: false }), 2000);
-				return failed;
-			} catch {
-				return failed;
-			}
-		} catch (error) {
-			console.error('ROOT Auth session failed, resetting local auth state', error);
-			await trySignOut();
+	try {
+		const res = await withTimeout(fetchAuthSession(), 3000);
+		if (!res.tokens) {
+			console.log('Root: Not logged in.');
 			return failed;
 		}
-	*/
+	} catch (e) {
+		if (e instanceof TimeoutError) refreshAll();
+		return failed;
+	}
 
 	const { data: profile, error } = await supabase.rpc('retrieve_profile');
 
@@ -146,3 +131,26 @@ export const load: LayoutLoad = async (): Promise<PageReturn> => {
 	console.log('Root: Signing in without existing profile');
 	return failed;
 };
+
+
+	/*
+		try {
+			const { tokens } = await withTimeout(fetchAuthSession(), 10);
+			console.log('Root Tokens ', tokens);
+			if (!tokens) throw Error('No Token, not signed in.');
+
+			
+			try {
+				console.log('No token, not signed in.');
+				//await trySignOut();
+				await withTimeout(signOut({ global: false }), 2000);
+				return failed;
+			} catch {
+				return failed;
+			}
+		} catch (error) {
+			console.error('ROOT Auth session failed, resetting local auth state', error);
+			await trySignOut();
+			return failed;
+		}
+	*/

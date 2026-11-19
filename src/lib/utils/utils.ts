@@ -65,8 +65,21 @@ export const generateDocumentName = (selected_preset: string) => {
 	);
 };
 
-export const withTimeout = <T>(p: Promise<T>, ms = 4000) =>
-  Promise.race([
-    p,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
-  ])
+/*
+	Note: read, written by ai and uses new concepts.
+*/
+
+export class TimeoutError extends Error {
+	constructor(ms: number) {
+		super(`Timed out after ${ms}ms`);
+		this.name = 'TimeoutError';
+	}
+}
+
+export const withTimeout = <T>(p: Promise<T>, ms = 4000) => {
+	let timer: ReturnType<typeof setTimeout>;
+	const timeout = new Promise<never>((_, reject) => {
+		timer = setTimeout(() => reject(new TimeoutError(ms)), ms);
+	});
+	return Promise.race([p, timeout]).finally(() => clearTimeout(timer));
+};
